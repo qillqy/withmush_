@@ -1,0 +1,42 @@
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/inter-regular.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(./fonts/inter-medium.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/jetbrains-mono.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Libre Barcode 128';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/libre-barcode-128.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Libre Barcode 39 Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/libre-barcode-39-text.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/libre-baskerville.ttf) format('truetype');
+}
