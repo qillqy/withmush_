@@ -1,6 +1,24 @@
 (() => {
   'use strict';
 
+  // 1. Blokir paksa fungsi window.open (mencegah popup tab baru)
+  window.open = () => null;
+
+  // 2. Bersihkan otomatis jika ISP/pihak ketiga menyuntikkan iframe/script iklan
+  const adGuard = new MutationObserver(mutations => {
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (node.nodeType !== 1) continue;
+        const tag = node.tagName.toLowerCase();
+        if (tag === 'iframe' || (tag === 'script' && node.src && !node.src.startsWith(location.origin))) {
+          node.remove();
+        }
+      }
+    }
+  });
+  adGuard.observe(document.documentElement, { childList: true, subtree: true });
+
+  // 3. Navigasi & Scrollspy
   const header = document.querySelector('.header');
   const links = [...document.querySelectorAll('.nav a')];
   const sections = ['about', 'resume', 'contact'].map(id => document.getElementById(id));
@@ -30,9 +48,10 @@
   }
 
   window.addEventListener('scroll', queueNavigationUpdate, { passive: true });
-  window.addEventListener('resize', queueNavigationUpdate);
+  window.addEventListener('resize', queueNavigationUpdate, { passive: true });
   updateNavigation();
 
+  // 4. Animasi Reveal
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const targets = [...document.querySelectorAll(
     '.resume-heading, .terminal > :not(.blank), .painting, .email-link'
