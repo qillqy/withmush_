@@ -90,7 +90,7 @@ a:focus-visible { outline: 2px solid white; outline-offset: 6px; }
 .contact { position: relative; height: 76.171875cqw; background: var(--ink); }
 .contact-background { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
 .email-link { position: absolute; inset: 0; display: block; text-decoration: none; }
-.contact-barcode { position: absolute; top: 32.6875cqw; left: 18.046875cqw; width: 67.578125cqw; text-align: center; font-family: 'Libre Barcode 39 Text', monospace; font-size: 7.5cqw; line-height: 1.45; letter-spacing: -.0375cqw; }
+.contact-barcode { position: absolute; top: 32.6875cqw; left: 18.046875cqw; width: 67.578125cqw; text-align: center; font-family: 'Libre Barcode 39 Text', monospace; font-size: 7.5cqw; line-height: 1.45; letter-spacing: -.0375cqw; user-select: none; }
 .contact-barcode::after { content: ''; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px; background: currentColor; transform: scaleX(0); transition: transform .25s ease; }
 .email-link:focus-visible { outline-offset: -8px; }
 .contact-barcode:hover::after { transform: scaleX(1); }
