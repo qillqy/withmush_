@@ -78,4 +78,15 @@
       targets.forEach(element => element.classList.add('is-visible'));
     });
   }
+
+  // 5. Animasi menghilang pada gambar person saat discroll melewati (terbalik dari muncul).
+  const person = document.querySelector('.hero-person');
+  if (person && 'IntersectionObserver' in window && !reducedMotion.matches) {
+    const personObserver = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        entry.target.classList.toggle('person-exiting', !entry.isIntersecting);
+      }
+    }, { threshold: .1 });
+    personObserver.observe(person);
+  }
 })();
