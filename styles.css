@@ -67,7 +67,87 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-body.modal-open { overflow: hidden; }
+body.modal-open, body.is-loading { overflow: hidden; }
+
+/* Editorial Loading Screen */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: var(--ink);
+  color: var(--white);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  will-change: transform, opacity;
+}
+.preloader-inner {
+  width: min(440px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  transition: opacity .38s ease, transform .5s var(--ease-fluid);
+}
+.preloader-kicker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  opacity: .56;
+}
+.preloader-barcode {
+  font-family: 'Libre Barcode 39 Text', monospace;
+  font-size: clamp(66px, 13vw, 114px);
+  line-height: 1;
+  letter-spacing: -.02em;
+  user-select: none;
+  animation: preloader-pulse 1.8s ease-in-out infinite;
+}
+@keyframes preloader-pulse {
+  0%, 100% { opacity: .82; }
+  50% { opacity: 1; }
+}
+.preloader-terminal {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(11px, 1vw, 13px);
+  opacity: .76;
+}
+.preloader-cmd {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.preloader-pct { font-variant-numeric: tabular-nums; }
+.preloader-track {
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, .14);
+  overflow: hidden;
+}
+.preloader-bar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--paper);
+  transform-origin: left center;
+  transform: scaleX(0);
+  will-change: transform;
+}
+.preloader.is-done {
+  transform: translate3d(0, -100%, 0);
+  pointer-events: none;
+  transition: transform .88s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.preloader.is-done .preloader-inner {
+  opacity: 0;
+  transform: translate3d(0, -24px, 0) scale(.97);
+}
 .site { width: 100%; container-type: inline-size; overflow: clip; }
 p, h1, h2, h3, figure, pre, ul, ol { margin: 0; }
 a { color: inherit; }
@@ -265,31 +345,61 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   padding-bottom: 6.5cqw;
 }
 
-/* Painting Gallery (existing aesthetic reference) */
+/* CMS 1: Art Gallery (Painting Gallery — white-framed exhibition aesthetic) */
 .painting-gallery {
-  padding: 2.8cqw 0;
-  min-height: 36.940372cqw;
+  padding: 4.2cqw 0 5cqw;
   background: var(--paper);
-  display: flex;
-  align-items: center;
+  color: var(--ink);
 }
+.art-band-header { margin-bottom: 2cqw; }
 .painting-pair {
-  display: flex;
-  align-items: center;
-  gap: 1.8cqw;
-  margin-left: 11.328125cqw;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2cqw;
+  align-items: start;
 }
 .painting-item {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
   transition: transform .55s var(--ease-fluid), filter .55s var(--ease-fluid);
   will-change: transform;
 }
 .painting-item:hover {
   transform: translate3d(0, -6px, 0);
-  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, .18));
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, .16));
 }
-.painting { display: block; height: 31.70226cqw; object-fit: fill; }
-.painting-red { width: 25.330498cqw; height: 31.663125cqw; }
-.painting-color { width: 25.361807cqw; height: 31.702261cqw; }
+.painting-frame-wrap {
+  width: 100%;
+  aspect-ratio: 325 / 406;
+  background: var(--white);
+  box-shadow: var(--frame-shadow);
+  overflow: hidden;
+}
+.painting {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .7s var(--ease-fluid);
+}
+.painting-item:hover .painting { transform: scale(1.03); }
+.art-placeholder { aspect-ratio: 325 / 406; }
+.painting-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: .85cqw;
+  font-family: 'JetBrains Mono', monospace;
+}
+.painting-caption-title {
+  font-size: clamp(12px, 1.02cqw, 15px);
+  color: #161616;
+}
+.painting-caption-meta {
+  font-size: clamp(10.5px, .84cqw, 12px);
+  color: var(--ink-muted);
+}
 
 /* ============================================================================
    CMS GALLERY BANDS (Matched to Painting Gallery & Frame Container Aesthetic)
@@ -625,7 +735,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   color: var(--white);
   border-radius: 2px;
 }
-.timeline-type-badge.is-pengalaman {
+.timeline-type-badge.is-experience {
   background: transparent;
   color: var(--ink);
   border: 1px solid var(--ink);
@@ -867,11 +977,24 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   background: #222;
   overflow: hidden;
 }
+.project-modal-visual.is-artwork {
+  aspect-ratio: auto;
+  max-height: 62vh;
+  background: #f5f5f5;
+  display: grid;
+  place-items: center;
+}
 .project-modal-visual img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+}
+.project-modal-visual.is-artwork img {
+  max-height: 62vh;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 .project-modal-body {
   background: var(--white);
@@ -1368,10 +1491,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 
   .resume-band { padding: 44px 0; }
 
-  .painting-gallery { min-height: 0; padding: 26px 6vw; }
-  .painting-pair { gap: 14px; margin: 0; width: 100%; }
-  .painting-item { flex: 1; min-width: 0; }
-  .painting { width: 100%; height: auto; aspect-ratio: 325 / 406; }
+  .painting-gallery { min-height: 0; padding: 34px 0 42px; }
+  .painting-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .painting-caption { padding-top: 9px; }
 
   /* CMS Bands Mobile */
   .cms-gallery-band { padding: 34px 0 42px; }

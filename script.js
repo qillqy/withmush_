@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  // 1. Blokir paksa fungsi window.open untuk iklan tak terduga (kecuali link resmi target _blank)
+  // 1. Block unexpected popup ads while preserving safe external links
   const nativeOpen = window.open.bind(window);
   window.open = (url, target, features) => {
     if (typeof url === 'string' && /^https?:\/\//i.test(url)) {
@@ -10,7 +10,7 @@
     return null;
   };
 
-  // 2. Bersihkan otomatis jika ISP/pihak ketiga menyuntikkan iframe/script iklan
+  // 2. Auto-clean injected third-party ad iframes/scripts
   const adGuard = new MutationObserver(mutations => {
     for (const mutation of mutations) {
       for (const node of mutation.addedNodes) {
@@ -28,9 +28,81 @@
   const finePointer = window.matchMedia('(pointer: fine)');
 
   // ==========================================================================
-  // 3. CMS DATA STORE (projects + educationExperience)
+  // 3. EDITORIAL LOADING SCREEN
   // ==========================================================================
-  const STORAGE_KEY = 'withmush_cms_data_v1';
+  const preloader = document.getElementById('preloader');
+  const preloaderBar = document.getElementById('preloader-bar');
+  const preloaderPct = document.getElementById('preloader-pct');
+
+  function runPreloader() {
+    if (!preloader) {
+      document.body.classList.remove('is-loading');
+      return;
+    }
+
+    if (reducedMotion.matches) {
+      preloader.remove();
+      document.body.classList.remove('is-loading');
+      return;
+    }
+
+    let current = 0;
+    let finished = false;
+    const startTime = performance.now();
+    const minDuration = 780;
+    let assetsReady = false;
+
+    const readyPromise = Promise.all([
+      document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve(),
+      new Promise(resolve => {
+        if (document.readyState === 'complete') resolve();
+        else window.addEventListener('load', resolve, { once: true });
+      })
+    ]);
+
+    readyPromise.then(() => { assetsReady = true; });
+    window.setTimeout(() => { assetsReady = true; }, 2100);
+
+    function finishPreloader() {
+      if (finished) return;
+      finished = true;
+      if (preloaderBar) preloaderBar.style.transform = 'scaleX(1)';
+      if (preloaderPct) preloaderPct.textContent = '100%';
+      window.setTimeout(() => {
+        preloader.classList.add('is-done');
+        document.body.classList.remove('is-loading');
+        window.setTimeout(() => preloader.remove(), 950);
+      }, 140);
+    }
+
+    function tick(now) {
+      if (finished) return;
+      const elapsed = now - startTime;
+      const target = assetsReady
+        ? 100
+        : Math.min(88, (elapsed / minDuration) * 84);
+
+      current += (target - current) * (assetsReady ? 0.18 : 0.1);
+      if (assetsReady && elapsed >= minDuration && current > 98.6) {
+        finishPreloader();
+        return;
+      }
+
+      const clamped = Math.min(99, Math.max(0, current));
+      if (preloaderBar) preloaderBar.style.transform = `scaleX(${(clamped / 100).toFixed(4)})`;
+      if (preloaderPct) preloaderPct.textContent = `${String(Math.round(clamped)).padStart(2, '0')}%`;
+      requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  runPreloader();
+
+  // ==========================================================================
+  // 4. CMS DATA STORE (artGallery + projects + educationExperience)
+  // ==========================================================================
+  const STORAGE_KEY = 'withmush_cms_data_v2';
 
   function cloneData(data) {
     return JSON.parse(JSON.stringify(data));
@@ -39,24 +111,30 @@
   function getDefaultData() {
     const src = window.CMS_DATA || {};
     return {
+      artGallery: Array.isArray(src.artGallery) ? cloneData(src.artGallery) : [],
       projects: Array.isArray(src.projects) ? cloneData(src.projects) : [],
       educationExperience: Array.isArray(src.educationExperience) ? cloneData(src.educationExperience) : []
     };
   }
 
   function loadCmsData() {
+    const defaults = getDefaultData();
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && Array.isArray(parsed.projects) && Array.isArray(parsed.educationExperience)) {
-          return parsed;
+          return {
+            artGallery: Array.isArray(parsed.artGallery) ? parsed.artGallery : defaults.artGallery,
+            projects: parsed.projects,
+            educationExperience: parsed.educationExperience
+          };
         }
       }
     } catch (_) {
-      // Fallback ke window.CMS_DATA jika localStorage tidak tersedia
+      // Fallback to window.CMS_DATA
     }
-    return getDefaultData();
+    return defaults;
   }
 
   function persistCmsData(data) {
@@ -81,7 +159,7 @@
   }
 
   // ==========================================================================
-  // 4. FLUID INTERSECTION REVEAL & SKILL BAR OBSERVER
+  // 5. FLUID INTERSECTION REVEAL & SKILL BAR OBSERVER
   // ==========================================================================
   let revealObserver = null;
 
@@ -130,9 +208,8 @@
 
   initRevealObserver();
 
-  // Observe static elements
   observeReveals([...document.querySelectorAll(
-    '.resume-heading, .terminal > :not(.blank), .painting-item, .cms-band-header, .skill-meter, .email-link'
+    '.resume-heading, .terminal > :not(.blank), .cms-band-header, .skill-meter, .email-link'
   )], 45);
 
   reducedMotion.addEventListener('change', event => {
@@ -147,7 +224,7 @@
   });
 
   // ==========================================================================
-  // 5. SUBTLE POINTER TILT FOR FRAMED CARDS & PAINTINGS
+  // 6. SUBTLE POINTER TILT FOR FRAMED CARDS & ARTWORKS
   // ==========================================================================
   function bindFluidTilt(elements) {
     if (reducedMotion.matches || !finePointer.matches) return;
@@ -168,10 +245,8 @@
     });
   }
 
-  bindFluidTilt([...document.querySelectorAll('[data-tilt]')]);
-
   // ==========================================================================
-  // 6. SLIDING FILTER PILL INDICATOR
+  // 7. SLIDING FILTER PILL INDICATOR
   // ==========================================================================
   function updateFilterIndicator(bar) {
     if (!bar) return;
@@ -183,7 +258,62 @@
   }
 
   // ==========================================================================
-  // 7. RENDER PROJECT CMS GALLERY
+  // 8. RENDER CMS 1: ART GALLERY
+  // ==========================================================================
+  const artGrid = document.getElementById('cms-art-grid');
+  const artCount = document.getElementById('art-count');
+
+  function renderArtGallery() {
+    if (!artGrid) return;
+    const items = cmsState.artGallery || [];
+    if (artCount) {
+      artCount.textContent = `${items.length} ${items.length === 1 ? 'artwork' : 'artworks'}`;
+    }
+
+    if (!items.length) {
+      artGrid.innerHTML = `<div class="cms-empty-state" style="grid-column:1/-1;">No artworks published yet.</div>`;
+      return;
+    }
+
+    artGrid.innerHTML = items.map((art, idx) => {
+      const num = String(idx + 1).padStart(2, '0');
+      const hasImage = Boolean(art.image && art.image.trim());
+      const visual = hasImage
+        ? `<img class="painting" src="${escapeHtml(art.image)}" alt="${escapeHtml(art.title || 'Artwork')}" loading="lazy" decoding="async">`
+        : `<div class="frame-art-placeholder art-placeholder">
+             <span class="frame-art-index">${num}</span>
+             <span class="frame-art-barcode" aria-hidden="true">${escapeHtml((art.title || 'ARTWORK').slice(0, 12).toUpperCase())}</span>
+             <span class="frame-art-cat">${escapeHtml(art.medium || 'Visual Art')}</span>
+           </div>`;
+
+      return `
+        <figure class="painting-item" tabindex="0" role="button" data-art-id="${escapeHtml(art.id)}" aria-label="View artwork ${escapeHtml(art.title)}">
+          <div class="painting-frame-wrap">${visual}</div>
+          <figcaption class="painting-caption">
+            <span class="painting-caption-title">${num} // ${escapeHtml(art.title || 'Untitled')}</span>
+            <span class="painting-caption-meta">${escapeHtml([art.medium, art.year].filter(Boolean).join(' · '))}</span>
+          </figcaption>
+        </figure>`;
+    }).join('');
+
+    const cards = [...artGrid.querySelectorAll('.painting-item')];
+    cards.forEach(card => {
+      const open = () => openArtModal(card.dataset.artId);
+      card.addEventListener('click', open);
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          open();
+        }
+      });
+    });
+
+    observeReveals(cards, 75);
+    bindFluidTilt(cards);
+  }
+
+  // ==========================================================================
+  // 9. RENDER CMS 2: PROJECTS GALLERY
   // ==========================================================================
   const projectsGrid = document.getElementById('cms-projects-grid');
   const projectsCount = document.getElementById('projects-count');
@@ -196,7 +326,7 @@
 
     projectsFilterBar.innerHTML = '<span class="filter-indicator" aria-hidden="true"></span>' +
       categories.map(cat => {
-        const label = cat === 'all' ? 'Semua' : cat;
+        const label = cat === 'all' ? 'All' : cat;
         const active = cat === activeProjectCategory;
         return `<button type="button" class="cms-filter-btn${active ? ' is-active' : ''}" data-filter="${escapeHtml(cat)}" role="tab" aria-selected="${active}">${escapeHtml(label)}</button>`;
       }).join('');
@@ -228,7 +358,7 @@
     }
 
     if (!filtered.length) {
-      projectsGrid.innerHTML = `<div class="cms-empty-state">Belum ada project pada kategori ini.</div>`;
+      projectsGrid.innerHTML = `<div class="cms-empty-state">No projects in this category yet.</div>`;
       return;
     }
 
@@ -245,7 +375,7 @@
            </div>`;
 
       return `
-        <article class="gallery-frame-card" tabindex="0" role="button" data-project-id="${escapeHtml(proj.id)}" aria-label="Lihat detail project ${escapeHtml(proj.title)}">
+        <article class="gallery-frame-card" tabindex="0" role="button" data-project-id="${escapeHtml(proj.id)}" aria-label="View project details for ${escapeHtml(proj.title)}">
           <div class="frame-canvas">${visual}</div>
           <div class="frame-plaque">
             <div class="frame-meta">
@@ -256,7 +386,7 @@
             <p class="frame-summary">${escapeHtml(proj.summary || proj.description || '')}</p>
             <div class="frame-footer">
               <div class="frame-tags">${stackTags}</div>
-              <span class="frame-cue">Detail &rarr;</span>
+              <span class="frame-cue">Details &rarr;</span>
             </div>
           </div>
         </article>`;
@@ -279,11 +409,16 @@
   }
 
   // ==========================================================================
-  // 8. RENDER EDUCATION & EXPERIENCE CMS TIMELINE
+  // 10. RENDER CMS 3: EDUCATION & EXPERIENCE TIMELINE
   // ==========================================================================
   const timelineList = document.getElementById('cms-timeline-list');
   const timelineCount = document.getElementById('timeline-count');
   const timelineFilterBar = document.getElementById('timeline-filter-bar');
+
+  function normalizeTimelineType(type) {
+    if (type === 'experience' || type === 'pengalaman') return 'experience';
+    return 'education';
+  }
 
   if (timelineFilterBar) {
     timelineFilterBar.querySelectorAll('.cms-filter-btn').forEach(btn => {
@@ -305,20 +440,20 @@
     if (!timelineList) return;
     const filtered = activeTimelineFilter === 'all'
       ? cmsState.educationExperience
-      : cmsState.educationExperience.filter(item => (item.type || 'pendidikan') === activeTimelineFilter);
+      : cmsState.educationExperience.filter(item => normalizeTimelineType(item.type) === activeTimelineFilter);
 
     if (timelineCount) {
-      timelineCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'entri' : 'entri'}`;
+      timelineCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'entry' : 'entries'}`;
     }
 
     if (!filtered.length) {
-      timelineList.innerHTML = `<li class="cms-empty-state">Belum ada data pada kategori ini.</li>`;
+      timelineList.innerHTML = `<li class="cms-empty-state">No entries in this category yet.</li>`;
       return;
     }
 
     timelineList.innerHTML = filtered.map(item => {
-      const isExp = item.type === 'pengalaman';
-      const badgeLabel = isExp ? 'Pengalaman' : 'Pendidikan';
+      const isExp = normalizeTimelineType(item.type) === 'experience';
+      const badgeLabel = isExp ? 'Experience' : 'Education';
       const orgLine = [item.organization, item.location].filter(Boolean).join(' · ');
       const highlights = (item.highlights || []).map(h => `<span class="timeline-chip">[+] ${escapeHtml(h)}</span>`).join('');
 
@@ -327,7 +462,7 @@
           <span class="timeline-node" aria-hidden="true"></span>
           <article class="timeline-frame-card">
             <div class="timeline-card-top">
-              <span class="timeline-type-badge${isExp ? ' is-pengalaman' : ''}">${badgeLabel}</span>
+              <span class="timeline-type-badge${isExp ? ' is-experience' : ''}">${badgeLabel}</span>
               <span class="timeline-period">${escapeHtml(item.period || '')}</span>
             </div>
             <h4 class="timeline-title">${escapeHtml(item.title)}</h4>
@@ -342,12 +477,13 @@
   }
 
   // Initial CMS render
+  renderArtGallery();
   renderProjectFilters();
   renderProjectsGrid();
   renderTimeline();
 
   // ==========================================================================
-  // 9. MODAL SYSTEM (Project Detail Lightbox + CMS Studio)
+  // 11. MODAL SYSTEM (Detail Lightbox + Passcode Auth + CMS Studio)
   // ==========================================================================
   function openModal(modalEl) {
     if (!modalEl) return;
@@ -378,17 +514,47 @@
     }
     if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'e') {
       e.preventDefault();
-      requestCmsAccess('projects');
+      requestCmsAccess('artGallery');
     }
   });
 
-  // Project Detail Lightbox
+  // Detail Lightbox (shared for Projects & Art Gallery)
   const projectModal = document.getElementById('project-modal');
+
+  function openArtModal(artId) {
+    const art = (cmsState.artGallery || []).find(a => a.id === artId);
+    if (!art || !projectModal) return;
+
+    const visual = document.getElementById('project-modal-visual');
+    visual.classList.add('is-artwork');
+    if (art.image && art.image.trim()) {
+      visual.innerHTML = `<img src="${escapeHtml(art.image)}" alt="${escapeHtml(art.title)}">`;
+    } else {
+      visual.innerHTML = `
+        <div class="frame-art-placeholder">
+          <span class="frame-art-index">${escapeHtml(art.year || 'ART')}</span>
+          <span class="frame-art-barcode" aria-hidden="true">${escapeHtml((art.title || 'ARTWORK').slice(0, 18).toUpperCase())}</span>
+          <span class="frame-art-cat">${escapeHtml(art.medium || 'Visual Art')}</span>
+        </div>`;
+    }
+
+    document.getElementById('project-modal-category').textContent = art.medium || 'Visual Art';
+    document.getElementById('project-modal-year').textContent = art.year || '';
+    document.getElementById('project-modal-status').textContent = '';
+    document.getElementById('project-modal-title').textContent = art.title || 'Untitled';
+    document.getElementById('project-modal-desc').textContent = art.description || '';
+    document.getElementById('project-modal-stack').innerHTML = '';
+    document.getElementById('project-modal-links').innerHTML = '';
+
+    openModal(projectModal);
+  }
+
   function openProjectModal(projectId) {
     const proj = cmsState.projects.find(p => p.id === projectId);
     if (!proj || !projectModal) return;
 
     const visual = document.getElementById('project-modal-visual');
+    visual.classList.remove('is-artwork');
     if (proj.image && proj.image.trim()) {
       visual.innerHTML = `<img src="${escapeHtml(proj.image)}" alt="${escapeHtml(proj.title)}">`;
     } else {
@@ -411,7 +577,7 @@
 
     const linksEl = document.getElementById('project-modal-links');
     const links = [];
-    if (proj.link) links.push(`<a class="project-ext-link" href="${escapeHtml(proj.link)}" target="_blank" rel="noopener noreferrer">Kunjungi Project &nearr;</a>`);
+    if (proj.link) links.push(`<a class="project-ext-link" href="${escapeHtml(proj.link)}" target="_blank" rel="noopener noreferrer">Visit Project &nearr;</a>`);
     if (proj.repo) links.push(`<a class="project-ext-link is-secondary" href="${escapeHtml(proj.repo)}" target="_blank" rel="noopener noreferrer">Source Code &nearr;</a>`);
     linksEl.innerHTML = links.join('');
 
@@ -419,14 +585,14 @@
   }
 
   // ==========================================================================
-  // 10. VISUAL CMS STUDIO (CRUD + Reorder + Export cms-data.js)
+  // 12. PRIVATE CMS STUDIO (Passcode Gate + 3 CMS Modules + Export)
   // ==========================================================================
   const cmsModal = document.getElementById('cms-modal');
   const cmsItemsList = document.getElementById('cms-items-list');
   const cmsForm = document.getElementById('cms-form');
   const cmsListLabel = document.getElementById('cms-list-label');
   const cmsToast = document.getElementById('cms-toast');
-  let cmsActiveTab = 'projects';
+  let cmsActiveTab = 'artGallery';
   let cmsSelectedId = null;
   let toastTimer = null;
 
@@ -442,7 +608,7 @@
     }, 2800);
   }
 
-  // SHA-256 pure-JS helper (bekerja konsisten di https://, localhost, maupun file://)
+  // Pure-JS SHA-256 helper (works identically on https://, localhost, and file://)
   function sha256Hex(message) {
     const bytes = new TextEncoder().encode(message);
     const K = [
@@ -492,7 +658,7 @@
     return H.map(v => v.toString(16).padStart(8, '0')).join('');
   }
 
-  // Passcode default: "withmush2026" (disimpan dalam bentuk SHA-256 hash)
+  // Default passcode: "withmush2026" (stored as SHA-256 hash)
   const CMS_PASSCODE_HASH = 'dd46f188df67d0c4d0266d5caf7c72be42d0a4c3586b4833a235f615a81b0603';
   const AUTH_SESSION_KEY = 'withmush_cms_unlocked_v1';
   const cmsAuthModal = document.getElementById('cms-auth-modal');
@@ -500,7 +666,7 @@
   const cmsAuthInput = document.getElementById('cms-auth-input');
   const cmsAuthError = document.getElementById('cms-auth-error');
   const cmsAuthCard = cmsAuthModal?.querySelector('.cms-auth-card');
-  let pendingCmsTab = 'projects';
+  let pendingCmsTab = 'artGallery';
 
   function isCmsUnlocked() {
     try { return sessionStorage.getItem(AUTH_SESSION_KEY) === '1'; } catch (_) { return false; }
@@ -513,20 +679,21 @@
     } catch (_) {}
   }
 
-  function openCmsStudio(tab = 'projects') {
-    cmsActiveTab = tab === 'educationExperience' ? 'educationExperience' : 'projects';
+  function openCmsStudio(tab = 'artGallery') {
+    const validTabs = ['artGallery', 'projects', 'educationExperience'];
+    cmsActiveTab = validTabs.includes(tab) ? tab : 'artGallery';
     document.querySelectorAll('.cms-tab-btn').forEach(btn => {
       const isAct = btn.dataset.cmsTab === cmsActiveTab;
       btn.classList.toggle('is-active', isAct);
       btn.setAttribute('aria-selected', String(isAct));
     });
-    const list = cmsState[cmsActiveTab];
+    const list = cmsState[cmsActiveTab] || [];
     cmsSelectedId = list[0]?.id || null;
     renderCmsStudio();
     openModal(cmsModal);
   }
 
-  function requestCmsAccess(tab = 'projects') {
+  function requestCmsAccess(tab = 'artGallery') {
     pendingCmsTab = tab;
     if (isCmsUnlocked()) {
       openCmsStudio(tab);
@@ -546,7 +713,7 @@
       setCmsUnlocked(true);
       closeModal(cmsAuthModal);
       window.setTimeout(() => openCmsStudio(pendingCmsTab), 220);
-      showToast('Akses CMS dibuka.');
+      showToast('CMS Studio unlocked.');
     } else {
       if (cmsAuthError) cmsAuthError.hidden = false;
       if (cmsAuthCard) {
@@ -558,7 +725,7 @@
     }
   });
 
-  // Trigger rahasia di HP/mobile: tap 5x cepat pada barcode RESUME
+  // Secret mobile trigger: tap 5x quickly on the RESUME barcode heading
   const resumeTitleEl = document.getElementById('resume-title');
   if (resumeTitleEl) {
     let tapCount = 0;
@@ -568,7 +735,7 @@
       clearTimeout(tapTimer);
       if (tapCount >= 5) {
         tapCount = 0;
-        requestCmsAccess('projects');
+        requestCmsAccess('artGallery');
       } else {
         tapTimer = setTimeout(() => { tapCount = 0; }, 1800);
       }
@@ -590,6 +757,7 @@
 
   function syncAndRefreshUI() {
     persistCmsData(cmsState);
+    renderArtGallery();
     renderProjectFilters();
     renderProjectsGrid();
     renderTimeline();
@@ -605,14 +773,17 @@
   }
 
   function renderCmsStudio() {
-    const arr = cmsState[cmsActiveTab];
-    cmsListLabel.textContent = cmsActiveTab === 'projects'
-      ? `Daftar Project (${arr.length})`
-      : `Pendidikan & Pengalaman (${arr.length})`;
+    const arr = cmsState[cmsActiveTab] || [];
+    const labels = {
+      artGallery: `Artworks (${arr.length})`,
+      projects: `Projects (${arr.length})`,
+      educationExperience: `Timeline Entries (${arr.length})`
+    };
+    cmsListLabel.textContent = labels[cmsActiveTab] || `Items (${arr.length})`;
 
     if (!arr.length) {
-      cmsItemsList.innerHTML = `<li class="cms-item-sub" style="padding:12px;">Belum ada item. Klik "+ Tambah Baru".</li>`;
-      cmsForm.innerHTML = `<p class="cms-item-sub" style="grid-column:1/-1;">Klik <strong>+ Tambah Baru</strong> di panel kiri untuk membuat entri pertama.</p>`;
+      cmsItemsList.innerHTML = `<li class="cms-item-sub" style="padding:12px;">No items yet. Click "+ Add New".</li>`;
+      cmsForm.innerHTML = `<p class="cms-item-sub" style="grid-column:1/-1;">Click <strong>+ Add New</strong> on the left to create your first entry.</p>`;
       return;
     }
 
@@ -621,18 +792,23 @@
     }
 
     cmsItemsList.innerHTML = arr.map((item, idx) => {
-      const sub = cmsActiveTab === 'projects'
-        ? `${item.category || 'Project'} · ${item.year || '-'}`
-        : `${item.type === 'pengalaman' ? 'Pengalaman' : 'Pendidikan'} · ${item.period || '-'}`;
+      let sub = '';
+      if (cmsActiveTab === 'artGallery') {
+        sub = `${item.medium || 'Visual Art'} · ${item.year || '-'}`;
+      } else if (cmsActiveTab === 'projects') {
+        sub = `${item.category || 'Project'} · ${item.year || '-'}`;
+      } else {
+        sub = `${normalizeTimelineType(item.type) === 'experience' ? 'Experience' : 'Education'} · ${item.period || '-'}`;
+      }
       return `
         <li class="cms-list-item${item.id === cmsSelectedId ? ' is-selected' : ''}" data-id="${escapeHtml(item.id)}">
           <div class="cms-item-info">
-            <div class="cms-item-title">${escapeHtml(item.title || 'Tanpa Judul')}</div>
+            <div class="cms-item-title">${escapeHtml(item.title || 'Untitled')}</div>
             <div class="cms-item-sub">${escapeHtml(sub)}</div>
           </div>
           <div class="cms-item-order">
-            <button type="button" class="cms-mini-btn" data-move="up" data-idx="${idx}" title="Geser ke atas">&uarr;</button>
-            <button type="button" class="cms-mini-btn" data-move="down" data-idx="${idx}" title="Geser ke bawah">&darr;</button>
+            <button type="button" class="cms-mini-btn" data-move="up" data-idx="${idx}" title="Move up">&uarr;</button>
+            <button type="button" class="cms-mini-btn" data-move="down" data-idx="${idx}" title="Move down">&darr;</button>
           </div>
         </li>`;
     }).join('');
@@ -655,18 +831,50 @@
     const current = arr.find(item => item.id === cmsSelectedId);
     if (!current) return;
 
-    if (cmsActiveTab === 'projects') {
+    if (cmsActiveTab === 'artGallery') {
       cmsForm.innerHTML = `
         <div class="cms-field is-full">
-          <label for="f-title">Judul Project</label>
+          <label for="f-title">Artwork Title</label>
           <input id="f-title" name="title" type="text" value="${escapeHtml(current.title)}" required>
         </div>
         <div class="cms-field">
-          <label for="f-category">Kategori</label>
-          <input id="f-category" name="category" type="text" value="${escapeHtml(current.category)}" placeholder="Data Science / Web Dev / Art">
+          <label for="f-medium">Medium / Style</label>
+          <input id="f-medium" name="medium" type="text" value="${escapeHtml(current.medium)}" placeholder="Abstract Painting / Acrylic on Canvas">
         </div>
         <div class="cms-field">
-          <label for="f-year">Tahun</label>
+          <label for="f-year">Year</label>
+          <input id="f-year" name="year" type="text" value="${escapeHtml(current.year)}" placeholder="2026">
+        </div>
+        <div class="cms-field is-full">
+          <label for="f-image">Image (local path ./assets/..., URL, or upload preview)</label>
+          <div class="cms-image-row">
+            <input id="f-image" name="image" type="text" value="${escapeHtml(current.image)}" placeholder="./assets/painting-new.png">
+            <label class="cms-upload-label">
+              Upload Image
+              <input id="f-image-file" type="file" accept="image/*" hidden>
+            </label>
+          </div>
+        </div>
+        <div class="cms-field is-full">
+          <label for="f-description">Artist Note / Description</label>
+          <textarea id="f-description" name="description">${escapeHtml(current.description)}</textarea>
+        </div>
+        <div class="cms-form-actions">
+          <button type="button" id="cms-delete-item" class="cms-btn cms-btn-danger">Delete Artwork</button>
+          <button type="submit" class="cms-btn cms-btn-primary">Save Changes</button>
+        </div>`;
+    } else if (cmsActiveTab === 'projects') {
+      cmsForm.innerHTML = `
+        <div class="cms-field is-full">
+          <label for="f-title">Project Title</label>
+          <input id="f-title" name="title" type="text" value="${escapeHtml(current.title)}" required>
+        </div>
+        <div class="cms-field">
+          <label for="f-category">Category</label>
+          <input id="f-category" name="category" type="text" value="${escapeHtml(current.category)}" placeholder="Data Science / Web Development / Art">
+        </div>
+        <div class="cms-field">
+          <label for="f-year">Year</label>
           <input id="f-year" name="year" type="text" value="${escapeHtml(current.year)}" placeholder="2026">
         </div>
         <div class="cms-field">
@@ -674,97 +882,98 @@
           <input id="f-status" name="status" type="text" value="${escapeHtml(current.status)}" placeholder="Completed / Active">
         </div>
         <div class="cms-field">
-          <label for="f-stack">Tech Stack / Tags (pisah koma)</label>
+          <label for="f-stack">Tech Stack / Tags (comma-separated)</label>
           <input id="f-stack" name="stack" type="text" value="${escapeHtml((current.stack || []).join(', '))}" placeholder="Python, SQL, HTML">
         </div>
         <div class="cms-field is-full">
-          <label for="f-image">Gambar (path lokal ./assets/... atau URL atau upload preview)</label>
+          <label for="f-image">Image (local path ./assets/..., URL, or upload preview)</label>
           <div class="cms-image-row">
             <input id="f-image" name="image" type="text" value="${escapeHtml(current.image)}" placeholder="./assets/project-1.png">
             <label class="cms-upload-label">
-              Upload Gambar
+              Upload Image
               <input id="f-image-file" type="file" accept="image/*" hidden>
             </label>
           </div>
         </div>
         <div class="cms-field is-full">
-          <label for="f-summary">Ringkasan Singkat (tampil di kartu bingkai)</label>
+          <label for="f-summary">Short Summary (shown on gallery card)</label>
           <textarea id="f-summary" name="summary">${escapeHtml(current.summary)}</textarea>
         </div>
         <div class="cms-field is-full">
-          <label for="f-description">Deskripsi Lengkap (tampil saat kartu diklik)</label>
+          <label for="f-description">Full Description (shown in detail modal)</label>
           <textarea id="f-description" name="description">${escapeHtml(current.description)}</textarea>
         </div>
         <div class="cms-field">
-          <label for="f-link">Link Demo / Live (opsional)</label>
+          <label for="f-link">Live / Demo URL (optional)</label>
           <input id="f-link" name="link" type="url" value="${escapeHtml(current.link)}" placeholder="https://...">
         </div>
         <div class="cms-field">
-          <label for="f-repo">Link Repository / GitHub (opsional)</label>
+          <label for="f-repo">Repository URL (optional)</label>
           <input id="f-repo" name="repo" type="url" value="${escapeHtml(current.repo)}" placeholder="https://github.com/...">
         </div>
         <div class="cms-form-actions">
-          <button type="button" id="cms-delete-item" class="cms-btn cms-btn-danger">Hapus Project</button>
-          <button type="submit" class="cms-btn cms-btn-primary">Simpan Perubahan</button>
+          <button type="button" id="cms-delete-item" class="cms-btn cms-btn-danger">Delete Project</button>
+          <button type="submit" class="cms-btn cms-btn-primary">Save Changes</button>
         </div>`;
-
-      const fileInput = document.getElementById('f-image-file');
-      if (fileInput) {
-        fileInput.addEventListener('change', () => {
-          const file = fileInput.files?.[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = () => {
-            document.getElementById('f-image').value = reader.result;
-            showToast('Preview gambar dimuat. Klik Simpan Perubahan.');
-          };
-          reader.readAsDataURL(file);
-        });
-      }
     } else {
+      const normalizedType = normalizeTimelineType(current.type);
       cmsForm.innerHTML = `
         <div class="cms-field">
-          <label for="f-type">Tipe</label>
+          <label for="f-type">Type</label>
           <select id="f-type" name="type">
-            <option value="pendidikan"${current.type === 'pendidikan' ? ' selected' : ''}>Pendidikan</option>
-            <option value="pengalaman"${current.type === 'pengalaman' ? ' selected' : ''}>Pengalaman</option>
+            <option value="education"${normalizedType === 'education' ? ' selected' : ''}>Education</option>
+            <option value="experience"${normalizedType === 'experience' ? ' selected' : ''}>Experience</option>
           </select>
         </div>
         <div class="cms-field">
-          <label for="f-period">Periode / Tahun</label>
-          <input id="f-period" name="period" type="text" value="${escapeHtml(current.period)}" placeholder="2024 — Sekarang">
+          <label for="f-period">Period / Year</label>
+          <input id="f-period" name="period" type="text" value="${escapeHtml(current.period)}" placeholder="2024 — Present">
         </div>
         <div class="cms-field is-full">
-          <label for="f-title">Judul / Jurusan / Peran</label>
+          <label for="f-title">Degree / Role / Title</label>
           <input id="f-title" name="title" type="text" value="${escapeHtml(current.title)}" required>
         </div>
         <div class="cms-field">
-          <label for="f-organization">Institusi / Organisasi</label>
+          <label for="f-organization">Institution / Organization</label>
           <input id="f-organization" name="organization" type="text" value="${escapeHtml(current.organization)}" placeholder="Telkom University">
         </div>
         <div class="cms-field">
-          <label for="f-location">Lokasi</label>
-          <input id="f-location" name="location" type="text" value="${escapeHtml(current.location)}" placeholder="Purwokerto / Remote">
+          <label for="f-location">Location</label>
+          <input id="f-location" name="location" type="text" value="${escapeHtml(current.location)}" placeholder="Indonesia / Remote">
         </div>
         <div class="cms-field is-full">
-          <label for="f-summary">Deskripsi</label>
+          <label for="f-summary">Description</label>
           <textarea id="f-summary" name="summary">${escapeHtml(current.summary)}</textarea>
         </div>
         <div class="cms-field is-full">
-          <label for="f-highlights">Poin / Highlight (pisah koma)</label>
-          <input id="f-highlights" name="highlights" type="text" value="${escapeHtml((current.highlights || []).join(', '))}" placeholder="Python, Statistika, Machine Learning">
+          <label for="f-highlights">Highlights / Skills (comma-separated)</label>
+          <input id="f-highlights" name="highlights" type="text" value="${escapeHtml((current.highlights || []).join(', '))}" placeholder="Python, Statistics, Machine Learning">
         </div>
         <div class="cms-form-actions">
-          <button type="button" id="cms-delete-item" class="cms-btn cms-btn-danger">Hapus Entri</button>
-          <button type="submit" class="cms-btn cms-btn-primary">Simpan Perubahan</button>
+          <button type="button" id="cms-delete-item" class="cms-btn cms-btn-danger">Delete Entry</button>
+          <button type="submit" class="cms-btn cms-btn-primary">Save Changes</button>
         </div>`;
+    }
+
+    const fileInput = document.getElementById('f-image-file');
+    if (fileInput) {
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          document.getElementById('f-image').value = reader.result;
+          showToast('Image preview loaded. Click Save Changes.');
+        };
+        reader.readAsDataURL(file);
+      });
     }
 
     document.getElementById('cms-delete-item')?.addEventListener('click', () => {
       cmsState[cmsActiveTab] = cmsState[cmsActiveTab].filter(item => item.id !== cmsSelectedId);
       cmsSelectedId = cmsState[cmsActiveTab][0]?.id || null;
       syncAndRefreshUI();
-      showToast('Item dihapus.');
+      showToast('Item deleted.');
     });
   }
 
@@ -775,7 +984,13 @@
     if (!current) return;
     const fd = new FormData(cmsForm);
 
-    if (cmsActiveTab === 'projects') {
+    if (cmsActiveTab === 'artGallery') {
+      current.title = String(fd.get('title') || '').trim() || 'Untitled Artwork';
+      current.medium = String(fd.get('medium') || '').trim() || 'Visual Art';
+      current.year = String(fd.get('year') || '').trim();
+      current.image = String(fd.get('image') || '').trim();
+      current.description = String(fd.get('description') || '').trim();
+    } else if (cmsActiveTab === 'projects') {
       current.title = String(fd.get('title') || '').trim() || 'Untitled Project';
       current.category = String(fd.get('category') || '').trim() || 'General';
       current.year = String(fd.get('year') || '').trim();
@@ -787,7 +1002,7 @@
       current.repo = String(fd.get('repo') || '').trim();
       current.stack = String(fd.get('stack') || '').split(',').map(s => s.trim()).filter(Boolean);
     } else {
-      current.type = String(fd.get('type') || 'pendidikan');
+      current.type = String(fd.get('type') || 'education');
       current.period = String(fd.get('period') || '').trim();
       current.title = String(fd.get('title') || '').trim() || 'Untitled Entry';
       current.organization = String(fd.get('organization') || '').trim();
@@ -797,20 +1012,30 @@
     }
 
     syncAndRefreshUI();
-    showToast('Perubahan disimpan & langsung tampil di halaman.');
+    showToast('Changes saved and synced live.');
   });
 
   document.getElementById('cms-add-new')?.addEventListener('click', () => {
-    const id = `${cmsActiveTab === 'projects' ? 'proj' : 'exp'}-${Date.now()}`;
-    if (cmsActiveTab === 'projects') {
+    const prefix = cmsActiveTab === 'artGallery' ? 'art' : (cmsActiveTab === 'projects' ? 'proj' : 'exp');
+    const id = `${prefix}-${Date.now()}`;
+    if (cmsActiveTab === 'artGallery') {
+      cmsState.artGallery.unshift({
+        id,
+        title: 'New Artwork',
+        medium: 'Abstract Painting',
+        year: String(new Date().getFullYear()),
+        image: '',
+        description: 'Write a short artist note about the concept, colors, or process behind this piece.'
+      });
+    } else if (cmsActiveTab === 'projects') {
       cmsState.projects.unshift({
         id,
-        title: 'Project Baru',
+        title: 'New Project',
         category: 'Data Science',
         year: String(new Date().getFullYear()),
         status: 'In Progress',
-        summary: 'Ringkasan singkat mengenai project ini.',
-        description: 'Jelaskan tujuan, proses, dan hasil dari project ini.',
+        summary: 'Brief summary of what this project explores or solves.',
+        description: 'Describe the problem, architecture, and key outcomes of this project.',
         stack: ['Python'],
         image: '',
         link: '',
@@ -819,18 +1044,18 @@
     } else {
       cmsState.educationExperience.unshift({
         id,
-        type: 'pendidikan',
-        period: `${new Date().getFullYear()} — Sekarang`,
-        title: 'Pendidikan / Pengalaman Baru',
-        organization: 'Nama Institusi / Organisasi',
-        location: 'Indonesia',
-        summary: 'Ceritakan peran, fokus pembelajaran, atau pencapaian utama di sini.',
-        highlights: ['Skill Utama']
+        type: 'education',
+        period: `${new Date().getFullYear()} — Present`,
+        title: 'New Education / Experience',
+        organization: 'Institution or Organization',
+        location: 'Remote',
+        summary: 'Describe your role, focus areas, or key achievements.',
+        highlights: ['Core Skill']
       });
     }
     cmsSelectedId = id;
     syncAndRefreshUI();
-    showToast('Item baru ditambahkan.');
+    showToast('New item added.');
   });
 
   function buildCmsFileString() {
@@ -847,22 +1072,22 @@
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    showToast('File cms-data.js berhasil didownload!');
+    showToast('cms-data.js downloaded.');
   });
 
   document.getElementById('cms-copy-btn')?.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(buildCmsFileString());
-      showToast('Isi cms-data.js disalin ke clipboard.');
+      showToast('cms-data.js copied to clipboard.');
     } catch (_) {
-      showToast('Gagal menyalin otomatis. Gunakan tombol Download.');
+      showToast('Copy failed. Please use Download instead.');
     }
   });
 
   document.getElementById('cms-lock-btn')?.addEventListener('click', () => {
     setCmsUnlocked(false);
     closeModal(cmsModal);
-    showToast('CMS dikunci kembali.');
+    showToast('CMS Studio locked.');
   });
 
   document.getElementById('cms-reset-btn')?.addEventListener('click', () => {
@@ -870,15 +1095,15 @@
     cmsState = getDefaultData();
     cmsSelectedId = cmsState[cmsActiveTab][0]?.id || null;
     syncAndRefreshUI();
-    showToast('Data dikembalikan sesuai file cms-data.js.');
+    showToast('Reset to default cms-data.js.');
   });
 
   if (new URLSearchParams(location.search).has('cms')) {
-    requestCmsAccess('projects');
+    requestCmsAccess('artGallery');
   }
 
   // ==========================================================================
-  // 11. FLUID SCROLL ENGINE (Lerp Parallax, Scroll Progress, Scrollspy)
+  // 13. FLUID SCROLL ENGINE (Lerp Parallax, Scroll Progress, Scrollspy)
   // ==========================================================================
   const header = document.querySelector('.header');
   const progressBar = document.querySelector('.scroll-progress');
@@ -921,7 +1146,6 @@
       progressBar.style.transform = `scaleX(${ratio.toFixed(4)})`;
     }
 
-    // Continuous smooth hero parallax & gentle exit fade for person image
     if (heroScene && !reducedMotion.matches) {
       const heroH = heroScene.offsetHeight || window.innerHeight;
       const p = Math.min(1.25, Math.max(0, smoothScrollY / heroH));

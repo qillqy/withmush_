@@ -1,23 +1,39 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Portofolio Mushab Aqil Sulaeman — Data Science student at Telkom University, creative thinker, and self-taught learner.">
+  <meta name="description" content="Portfolio of Mushab Aqil Sulaeman — Data Science student at Telkom University, creative thinker, and self-taught builder.">
   <meta name="theme-color" content="#2d2d2d">
   <title>Mushab Aqil Sulaeman — Portfolio</title>
   <link rel="preload" href="./assets/fonts/libre-barcode-128.ttf" as="font" type="font/ttf">
+  <link rel="preload" href="./assets/fonts/libre-barcode-39-text.ttf" as="font" type="font/ttf">
   <link rel="preload" href="./assets/fonts/inter-regular.ttf" as="font" type="font/ttf">
-  <link rel="stylesheet" href="./styles.css?v=13">
-  <script src="./cms-data.js?v=1" defer></script>
-  <script src="./script.js?v=10" defer></script>
+  <link rel="stylesheet" href="./styles.css?v=14">
+  <script src="./cms-data.js?v=2" defer></script>
+  <script src="./script.js?v=11" defer></script>
 </head>
-<body>
+<body class="is-loading">
+  <!-- EDITORIAL LOADING SCREEN -->
+  <div id="preloader" class="preloader" role="status" aria-live="polite" aria-label="Loading portfolio">
+    <div class="preloader-inner">
+      <p class="preloader-kicker">WITHMUSH_ // PORTFOLIO</p>
+      <div class="preloader-barcode" aria-hidden="true">MUSHAB</div>
+      <div class="preloader-terminal">
+        <span class="preloader-cmd">$ init portfolio --mode=editorial</span>
+        <span id="preloader-pct" class="preloader-pct">00%</span>
+      </div>
+      <div class="preloader-track" aria-hidden="true">
+        <span id="preloader-bar" class="preloader-bar"></span>
+      </div>
+    </div>
+  </div>
+
   <div class="scroll-progress" aria-hidden="true"></div>
-  <a class="skip-link" href="#resume">Lewati ke resume</a>
+  <a class="skip-link" href="#resume">Skip to resume</a>
 
   <header class="header">
-    <nav class="nav" aria-label="Navigasi utama">
+    <nav class="nav" aria-label="Primary navigation">
       <a href="#about" aria-current="location">About</a>
       <a href="#resume">Resume</a>
       <a href="#contact">Contact</a>
@@ -29,10 +45,10 @@
       <div class="hero-scene">
         <img class="design-divider" src="./assets/divider.svg" alt="" aria-hidden="true">
         <img class="hero-background" src="./assets/hero-background.png" alt="" fetchpriority="high" decoding="async">
-        <div class="hero-barcode" aria-label="Hello" lang="en">HELLO</div>
-        <img class="hero-person" src="./assets/person.png" alt="Mushab Aqil Sulaeman berdiri di taman" fetchpriority="high" decoding="async">
+        <div class="hero-barcode" aria-label="Hello">HELLO</div>
+        <img class="hero-person" src="./assets/person.png" alt="Mushab Aqil Sulaeman standing outdoors" fetchpriority="high" decoding="async">
       </div>
-      <div class="hero-copy" lang="en">
+      <div class="hero-copy">
         <h1 id="name">Mushab Aqil S</h1>
         <div class="hero-bio">
           <p>My name is Mushab Aqil Sulaeman, and you can call me Mushab.<br>I am a multidisciplinary learner with a strong interest in coding, art, photography, cinematography, and literature.</p>
@@ -42,19 +58,19 @@
     </section>
 
     <section id="resume" class="resume" aria-labelledby="resume-title">
-      <!-- 01 — CREATIVE DEVELOPMENT -->
+      <!-- 01 — CREATIVE DEVELOPMENT (Intro before Art Gallery CMS) -->
       <div class="creative">
-        <h2 id="resume-title" class="resume-heading" lang="en">Resume</h2>
+        <h2 id="resume-title" class="resume-heading">Resume</h2>
         <div class="terminal creative-text">
           <p class="terminal-identity">MUSHAB AQIL SULAEMAN</p>
-          <p><span class="code-prompt">$ whoami</span>  Mushab Aqil Sulaeman — Data Science Student @ Telkom University · Creative Thinker · Self-Taught Learner</p>
+          <p><span class="code-prompt">$ whoami</span>  Mushab Aqil Sulaeman — Data Science Student @ Telkom University · Creative Thinker · Self-Taught Builder</p>
           <p class="blank" aria-hidden="true">&#160;</p>
           <h3 class="terminal-heading">01 — CREATIVE DEVELOPMENT</h3>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p class="terminal-label">PROJECT: PAINTING</p>
+          <p class="terminal-label">MODULE: CMS_ART_GALLERY</p>
           <pre class="code-block"><code><span class="code-kw">class</span> <span class="code-fn">CreativeDevelopment</span>:
-    <span class="code-kw">def</span> <span class="code-fn">__init__</span>(<span class="code-self">self</span>):
-        <span class="code-self">self</span>.medium  = <span class="code-str">"Painting"</span>
+    <span class="code-kw">def</span> <span class="code-fn">__init__</span>(<span class="code-self">self</span>, source=<span class="code-str">"cms-data.js"</span>):
+        <span class="code-self">self</span>.medium  = <span class="code-str">"Painting &amp; Visual Art"</span>
         <span class="code-self">self</span>.purpose = <span class="code-str">"Creative Exploration"</span>
         <span class="code-self">self</span>.focus   = [
             <span class="code-str">"Visual Thinking"</span>,
@@ -63,13 +79,13 @@
             <span class="code-str">"Experimentation"</span>
         ]
 
-    <span class="code-kw">def</span> <span class="code-fn">develop</span>(<span class="code-self">self</span>):
-        <span class="code-kw">return</span> <span class="code-str">"Turning ideas into visual forms."</span></code></pre>
+    <span class="code-kw">def</span> <span class="code-fn">exhibit</span>(<span class="code-self">self</span>):
+        <span class="code-kw">return</span> cms.query(<span class="code-str">"artGallery"</span>, frame=<span class="code-str">"white_mat"</span>)</code></pre>
           <p class="blank" aria-hidden="true">&#160;</p>
           <p class="terminal-subhead">Overview</p>
-          <p>Lukisan menjadi salah satu media dalam mengembangkan kreativitas dan cara berpikir visual. Melalui proses mengamati, mengeksplorasi warna, menyusun komposisi, dan menuangkan gagasan ke dalam bentuk visual, proses melukis tidak hanya menjadi aktivitas artistik, tetapi juga menjadi latihan dalam memahami perspektif dan menciptakan sesuatu dari sebuah ide.</p>
+          <p>Painting serves as a core medium for cultivating creativity and visual thinking. Through observing, exploring color, arranging composition, and translating abstract thoughts into form, painting becomes more than artistic expression—it is an exercise in perspective and bringing raw ideas to life.</p>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p class="terminal-pipeline">IDE │ OBSERVATION │ EXPLORATION │ EXPERIMENTATION │ VISUAL OUTPUT │ REFLECTION</p>
+          <p class="terminal-pipeline">IDEA │ OBSERVATION │ EXPLORATION │ EXPERIMENTATION │ VISUAL OUTPUT │ REFLECTION</p>
           <p class="blank" aria-hidden="true">&#160;</p>
           <p class="terminal-subhead">Skills Developed</p>
           <p>[+] Creativity</p>
@@ -81,18 +97,20 @@
         </div>
       </div>
 
-      <div class="painting-gallery" aria-label="Galeri project painting">
-        <div class="painting-pair">
-          <figure class="painting-item" data-tilt>
-            <img class="painting painting-red" src="./assets/painting-red.png" alt="Lukisan abstrak berwarna merah dalam bingkai putih" loading="lazy" decoding="async" width="325" height="406">
-          </figure>
-          <figure class="painting-item" data-tilt>
-            <img class="painting painting-color" src="./assets/painting-color.png" alt="Lukisan abstrak berwarna-warni dalam bingkai putih" loading="lazy" decoding="async" width="325" height="406">
-          </figure>
+      <!-- CMS 1: ART GALLERY -->
+      <div class="painting-gallery" aria-label="Art gallery">
+        <div class="cms-band-inner">
+          <div class="cms-band-header art-band-header">
+            <div class="cms-band-meta">
+              <span class="cms-band-kicker">CMS // ART GALLERY</span>
+              <span id="art-count" class="cms-band-count">0 artworks</span>
+            </div>
+          </div>
+          <div id="cms-art-grid" class="painting-pair" aria-live="polite"></div>
         </div>
       </div>
 
-      <!-- 02 — SELECTED PROJECTS (Penjelasan sebelum bab CMS Project) -->
+      <!-- 02 — PROJECTS ARCHIVE (Intro before Projects CMS) -->
       <div class="resume-band projects-intro">
         <div class="terminal">
           <h3 class="terminal-heading">02 — PROJECTS ARCHIVE</h3>
@@ -108,22 +126,22 @@
         <span class="code-kw">return</span> cms.query(<span class="code-str">"projects"</span>, sort=<span class="code-str">"latest"</span>)</code></pre>
           <p class="blank" aria-hidden="true">&#160;</p>
           <p class="terminal-subhead">Overview</p>
-          <p>Bagian ini menghimpun berbagai project yang telah saya bangun—mulai dari eksplorasi analisis data, pengembangan web, hingga eksperimen visual. Setiap karya disimpan secara terstruktur dalam sistem CMS Project dan dipamerkan layaknya koleksi galeri berbingkai agar proses, teknologi, dan hasil tiap project mudah ditelusuri.</p>
+          <p>This archive brings together selected works I have built—spanning data analysis, web engineering, and creative experiments. Each project is managed through a structured CMS and presented as a framed exhibition piece so its stack, context, and outcomes can be explored clearly.</p>
           <p class="blank" aria-hidden="true">&#160;</p>
           <p class="terminal-pipeline">CONCEPT │ ARCHITECTURE │ BUILD │ ITERATE │ SHOWCASE</p>
         </div>
       </div>
 
-      <!-- BAB CMS 1: GALERI PROJECT -->
-      <div class="cms-gallery-band projects-band" aria-label="Galeri project dari CMS">
+      <!-- CMS 2: PROJECTS GALLERY -->
+      <div class="cms-gallery-band projects-band" aria-label="Projects gallery">
         <div class="cms-band-inner">
           <div class="cms-band-header">
             <div class="cms-band-meta">
               <span class="cms-band-kicker">CMS // PROJECTS</span>
-              <span id="projects-count" class="cms-band-count">0 works</span>
+              <span id="projects-count" class="cms-band-count">0 projects</span>
             </div>
             <div class="cms-band-controls">
-              <div id="projects-filter-bar" class="cms-filter-bar" role="tablist" aria-label="Filter kategori project">
+              <div id="projects-filter-bar" class="cms-filter-bar" role="tablist" aria-label="Filter projects by category">
                 <span class="filter-indicator" aria-hidden="true"></span>
               </div>
             </div>
@@ -132,7 +150,7 @@
         </div>
       </div>
 
-      <!-- 03 — EDUCATION & EXPERIENCE (Penjelasan sebelum bab CMS Pengalaman & Pendidikan) -->
+      <!-- 03 — EDUCATION & EXPERIENCE (Intro before Education & Experience CMS) -->
       <div class="resume-band education-intro">
         <div class="terminal">
           <h3 class="terminal-heading">03 — EDUCATION &amp; EXPERIENCE</h3>
@@ -142,16 +160,16 @@
     <span class="code-str">"name"</span>:       <span class="code-str">"Mushab Aqil Sulaeman"</span>,
     <span class="code-str">"role"</span>:       <span class="code-str">"Data Science Student"</span>,
     <span class="code-str">"university"</span>: <span class="code-str">"Telkom University"</span>,
-    <span class="code-str">"tracks"</span>:     [<span class="code-str">"Pendidikan"</span>, <span class="code-str">"Pengalaman"</span>, <span class="code-str">"Self-Taught"</span>]
+    <span class="code-str">"tracks"</span>:     [<span class="code-str">"Education"</span>, <span class="code-str">"Experience"</span>, <span class="code-str">"Self-Taught"</span>]
 }
 
 <span class="code-self">timeline</span> = cms.load(<span class="code-str">"educationExperience"</span>, order=<span class="code-str">"chronological"</span>)
 <span class="code-fn">print</span>(<span class="code-self">timeline</span>)</code></pre>
           <p class="blank" aria-hidden="true">&#160;</p>
           <p class="terminal-subhead">Overview</p>
-          <p>Sebagai mahasiswa Data Science di Telkom University, saya mempelajari bagaimana data digunakan untuk memahami masalah, menemukan pola, dan mendukung pengambilan keputusan—mencakup matematika, statistika, algoritma, pemrograman, dan machine learning.</p>
+          <p>As a Data Science student at Telkom University, I study how data can be used to frame complex problems, uncover meaningful patterns, and inform better decisions—combining mathematics, statistics, algorithms, programming, and machine learning.</p>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p>Di bawah ini tersusun runtutan pendidikan dan pengalaman saya secara kronologis melalui CMS Pengalaman &amp; Pendidikan, menggambarkan bagaimana fondasi akademik bertemu dengan praktik nyata dan eksplorasi mandiri.</p>
+          <p>Below is a chronological record of my academic background and hands-on experience, illustrating how formal study meets independent practice.</p>
           <p class="blank" aria-hidden="true">&#160;</p>
           <p class="terminal-pipeline">MATHEMATICS │ STATISTICS │ PROGRAMMING │ DATA ANALYSIS │ MACHINE LEARNING</p>
           <p class="blank" aria-hidden="true">&#160;</p>
@@ -163,8 +181,8 @@
         </div>
       </div>
 
-      <!-- BAB CMS 2: RUNTUTAN PENGALAMAN & PENDIDIKAN -->
-      <div class="cms-gallery-band timeline-band" aria-label="Runtutan pengalaman dan pendidikan dari CMS">
+      <!-- CMS 3: EDUCATION & EXPERIENCE TIMELINE -->
+      <div class="cms-gallery-band timeline-band" aria-label="Education and experience timeline">
         <div class="cms-band-inner">
           <div class="cms-band-header">
             <div class="cms-band-meta">
@@ -172,11 +190,11 @@
               <span id="timeline-count" class="cms-band-count">0 entries</span>
             </div>
             <div class="cms-band-controls">
-              <div id="timeline-filter-bar" class="cms-filter-bar" role="tablist" aria-label="Filter pengalaman dan pendidikan">
+              <div id="timeline-filter-bar" class="cms-filter-bar" role="tablist" aria-label="Filter education and experience">
                 <span class="filter-indicator" aria-hidden="true"></span>
-                <button type="button" class="cms-filter-btn is-active" data-filter="all" role="tab" aria-selected="true">Semua</button>
-                <button type="button" class="cms-filter-btn" data-filter="pendidikan" role="tab" aria-selected="false">Pendidikan</button>
-                <button type="button" class="cms-filter-btn" data-filter="pengalaman" role="tab" aria-selected="false">Pengalaman</button>
+                <button type="button" class="cms-filter-btn is-active" data-filter="all" role="tab" aria-selected="true">All</button>
+                <button type="button" class="cms-filter-btn" data-filter="education" role="tab" aria-selected="false">Education</button>
+                <button type="button" class="cms-filter-btn" data-filter="experience" role="tab" aria-selected="false">Experience</button>
               </div>
             </div>
           </div>
@@ -199,9 +217,9 @@
         <span class="code-kw">return</span> result</code></pre>
           <p class="blank" aria-hidden="true">&#160;</p>
           <p class="terminal-subhead">Philosophy</p>
-          <p>Kemampuan belajar secara otodidak dibangun melalui rasa ingin tahu, eksplorasi, dan keberanian untuk mencoba sesuatu yang belum dipahami.</p>
+          <p>Self-taught capability grows from curiosity, deliberate exploration, and the willingness to step into unfamiliar territory.</p>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p>Bagi saya, belajar bukan hanya menerima informasi, tetapi memahami bagaimana sesuatu bekerja, mencoba menerapkannya, menemukan kesalahan, kemudian memperbaikinya.</p>
+          <p>To me, learning is not merely absorbing information—it means understanding how systems work, putting ideas into practice, spotting mistakes, and refining them through iteration.</p>
           <p class="blank" aria-hidden="true">&#160;</p>
           <p><span class="code-prompt">$ learn --mode=self-taught</span>  &gt; encounter_problem &gt; search_information &gt; understand_concept &gt; build_experiment &gt; make_mistakes &gt; analyze &gt; improve &gt; repeat</p>
         </div>
@@ -221,7 +239,7 @@
           <p class="blank" aria-hidden="true">&#160;</p>
           <h3 class="terminal-heading">CURRENT VERSION</h3>
           <p>MUSHAB_AQIL_SULAEMAN</p>
-          <div class="skill-meters" aria-label="Tingkat eksplorasi skill saat ini">
+          <div class="skill-meters" aria-label="Current skill exploration levels">
             <div class="skill-meter" data-level="80">
               <span class="skill-label">Creative Development</span>
               <span class="skill-track" aria-hidden="true"><span class="skill-fill"></span></span>
@@ -258,17 +276,17 @@
     <footer id="contact" class="contact" aria-labelledby="contact-title">
       <h2 id="contact-title" class="sr-only">Contact Mushab</h2>
       <img class="contact-background" src="./assets/contact-background.png" alt="" loading="lazy" decoding="async">
-      <a class="email-link" href="mailto:mushabaqilsulaeman@gmail.com" aria-label="Kirim email ke mushabaqilsulaeman@gmail.com">
+      <a class="email-link" href="mailto:mushabaqilsulaeman@gmail.com" aria-label="Send an email to mushabaqilsulaeman@gmail.com">
         <span class="contact-barcode" aria-hidden="true">mushabaqilsulaeman</span>
       </a>
     </footer>
   </main>
 
-  <!-- MODAL DETAIL PROJECT -->
+  <!-- DETAIL LIGHTBOX MODAL (Projects & Art Gallery) -->
   <div id="project-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="project-modal-title" hidden>
     <div class="modal-backdrop" data-close-modal="project-modal"></div>
     <div class="modal-card project-modal-card">
-      <button type="button" class="modal-close" data-close-modal="project-modal" aria-label="Tutup detail project">&times;</button>
+      <button type="button" class="modal-close" data-close-modal="project-modal" aria-label="Close detail view">&times;</button>
       <div class="project-modal-frame">
         <div id="project-modal-visual" class="project-modal-visual"></div>
       </div>
@@ -286,48 +304,51 @@
     </div>
   </div>
 
-  <!-- MODAL PASSCODE CMS (Private Access) -->
+  <!-- CMS PASSCODE AUTH MODAL (Private Access) -->
   <div id="cms-auth-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cms-auth-title" hidden>
     <div class="modal-backdrop" data-close-modal="cms-auth-modal"></div>
     <div class="cms-auth-card">
-      <button type="button" class="modal-close" data-close-modal="cms-auth-modal" aria-label="Tutup autentikasi CMS">&times;</button>
+      <button type="button" class="modal-close" data-close-modal="cms-auth-modal" aria-label="Close CMS authentication">&times;</button>
       <p class="cms-studio-kicker">WITHMUSH_ // PRIVATE ACCESS</p>
-      <h3 id="cms-auth-title" class="cms-auth-title">Masukkan Passcode CMS</h3>
-      <p class="cms-auth-desc">Area pengelolaan konten ini hanya untuk pemilik portofolio.</p>
+      <h3 id="cms-auth-title" class="cms-auth-title">Enter CMS Passcode</h3>
+      <p class="cms-auth-desc">This content studio is restricted to the portfolio owner.</p>
       <form id="cms-auth-form" class="cms-auth-form" autocomplete="off">
         <input id="cms-auth-input" class="cms-auth-input" type="password" placeholder="Passcode..." autocomplete="current-password" required>
-        <p id="cms-auth-error" class="cms-auth-error" role="alert" hidden>Passcode salah. Coba lagi.</p>
-        <button type="submit" class="cms-btn cms-btn-primary cms-auth-submit">Buka CMS Studio</button>
+        <p id="cms-auth-error" class="cms-auth-error" role="alert" hidden>Incorrect passcode. Please try again.</p>
+        <button type="submit" class="cms-btn cms-btn-primary cms-auth-submit">Unlock CMS Studio</button>
       </form>
     </div>
   </div>
 
-  <!-- CMS STUDIO MODAL (Project CMS + Pengalaman & Pendidikan CMS) -->
+  <!-- CMS STUDIO MODAL (Art Gallery + Projects + Education & Experience) -->
   <div id="cms-modal" class="modal-overlay cms-overlay" role="dialog" aria-modal="true" aria-labelledby="cms-modal-title" hidden>
     <div class="modal-backdrop" data-close-modal="cms-modal"></div>
     <div class="cms-studio">
       <header class="cms-studio-header">
         <div>
           <p class="cms-studio-kicker">WITHMUSH_ // PORTFOLIO CMS</p>
-          <h3 id="cms-modal-title" class="cms-studio-title">Kelola Konten Resume</h3>
+          <h3 id="cms-modal-title" class="cms-studio-title">Manage Portfolio Content</h3>
         </div>
-        <button type="button" class="modal-close" data-close-modal="cms-modal" aria-label="Tutup CMS Studio">&times;</button>
+        <button type="button" class="modal-close" data-close-modal="cms-modal" aria-label="Close CMS Studio">&times;</button>
       </header>
 
       <div class="cms-studio-tabs" role="tablist">
-        <button type="button" class="cms-tab-btn is-active" data-cms-tab="projects" role="tab" aria-selected="true">
-          01. CMS Project
+        <button type="button" class="cms-tab-btn is-active" data-cms-tab="artGallery" role="tab" aria-selected="true">
+          01. Art Gallery CMS
+        </button>
+        <button type="button" class="cms-tab-btn" data-cms-tab="projects" role="tab" aria-selected="false">
+          02. Projects CMS
         </button>
         <button type="button" class="cms-tab-btn" data-cms-tab="educationExperience" role="tab" aria-selected="false">
-          02. CMS Pengalaman &amp; Pendidikan
+          03. Education &amp; Experience CMS
         </button>
       </div>
 
       <div class="cms-studio-body">
         <aside class="cms-list-pane">
           <div class="cms-list-toolbar">
-            <span id="cms-list-label" class="cms-list-label">Daftar Item</span>
-            <button type="button" id="cms-add-new" class="cms-btn cms-btn-primary">+ Tambah Baru</button>
+            <span id="cms-list-label" class="cms-list-label">Items</span>
+            <button type="button" id="cms-add-new" class="cms-btn cms-btn-primary">+ Add New</button>
           </div>
           <ul id="cms-items-list" class="cms-items-list"></ul>
         </aside>
@@ -338,9 +359,9 @@
       </div>
 
       <footer class="cms-studio-footer">
-        <p class="cms-export-note">Perubahan langsung tampil di halaman (tersimpan di browser). Untuk publikasi permanen, download <code>cms-data.js</code> lalu timpa file di folder proyek.</p>
+        <p class="cms-export-note">Changes preview live in your browser. To publish permanently, download <code>cms-data.js</code> and replace the file in your repository.</p>
         <div class="cms-footer-actions">
-          <button type="button" id="cms-lock-btn" class="cms-btn cms-btn-ghost">Kunci CMS</button>
+          <button type="button" id="cms-lock-btn" class="cms-btn cms-btn-ghost">Lock CMS</button>
           <button type="button" id="cms-reset-btn" class="cms-btn cms-btn-ghost">Reset Default</button>
           <button type="button" id="cms-copy-btn" class="cms-btn cms-btn-secondary">Copy cms-data.js</button>
           <button type="button" id="cms-download-btn" class="cms-btn cms-btn-primary">Download cms-data.js</button>
