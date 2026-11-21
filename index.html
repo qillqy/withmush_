@@ -8,19 +8,22 @@
   <title>Mushab Aqil Sulaeman — Portfolio</title>
   <link rel="preload" href="./assets/fonts/libre-barcode-128.ttf" as="font" type="font/ttf">
   <link rel="preload" href="./assets/fonts/inter-regular.ttf" as="font" type="font/ttf">
-  <link rel="stylesheet" href="./assets/fonts.css">
-  <link rel="stylesheet" href="./styles.css?v=10">
-  <script src="./script.js?v=7" defer></script>
+  <link rel="stylesheet" href="./styles.css?v=11">
+  <script src="./cms-data.js?v=1" defer></script>
+  <script src="./script.js?v=8" defer></script>
 </head>
 <body>
+  <div class="scroll-progress" aria-hidden="true"></div>
   <a class="skip-link" href="#resume">Lewati ke resume</a>
+
   <header class="header">
     <nav class="nav" aria-label="Navigasi utama">
-      <a href="#resume">Resume</a>
       <a href="#about" aria-current="location">About</a>
+      <a href="#resume">Resume</a>
       <a href="#contact">Contact</a>
     </nav>
   </header>
+
   <main class="site">
     <section id="about" class="hero" aria-labelledby="name">
       <div class="hero-scene">
@@ -39,100 +42,226 @@
     </section>
 
     <section id="resume" class="resume" aria-labelledby="resume-title">
+      <!-- 01 — CREATIVE DEVELOPMENT -->
       <div class="creative">
         <h2 id="resume-title" class="resume-heading" lang="en">Resume</h2>
         <div class="terminal creative-text">
-          <p>MUSHAB AQIL SULAEMAN</p>
-          <p>$ whoami  Mushab Aqil Sulaeman Data Science Student @ Telkom University Creative Thinker • Self-Taught Learner • Technology Enthusiast</p>
+          <p class="terminal-identity">MUSHAB AQIL SULAEMAN</p>
+          <p><span class="code-prompt">$ whoami</span>  Mushab Aqil Sulaeman — Data Science Student @ Telkom University · Creative Thinker · Self-Taught Learner</p>
           <p class="blank" aria-hidden="true">&#160;</p>
           <h3 class="terminal-heading">01 — CREATIVE DEVELOPMENT</h3>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p>PROJECT: PAINTING</p>
-          <p>class CreativeDevelopment:  </p>
+          <p class="terminal-label">PROJECT: PAINTING</p>
+          <pre class="code-block"><code><span class="code-kw">class</span> <span class="code-fn">CreativeDevelopment</span>:
+    <span class="code-kw">def</span> <span class="code-fn">__init__</span>(<span class="code-self">self</span>):
+        <span class="code-self">self</span>.medium  = <span class="code-str">"Painting"</span>
+        <span class="code-self">self</span>.purpose = <span class="code-str">"Creative Exploration"</span>
+        <span class="code-self">self</span>.focus   = [
+            <span class="code-str">"Visual Thinking"</span>,
+            <span class="code-str">"Observation"</span>,
+            <span class="code-str">"Expression"</span>,
+            <span class="code-str">"Experimentation"</span>
+        ]
+
+    <span class="code-kw">def</span> <span class="code-fn">develop</span>(<span class="code-self">self</span>):
+        <span class="code-kw">return</span> <span class="code-str">"Turning ideas into visual forms."</span></code></pre>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p>       def __init__(self): </p>
-          <p>       self.medium = "Painting" 
-       self.purpose = "Creative Exploration" </p>
-          <p>       self.focus = [ </p>
-          <p>             "Visual Thinking", </p>
-          <p>             "Observation", </p>
-          <p>             "Expression",         </p>
-          <p>             "Experimentation" ]  </p>
-          <p class="blank" aria-hidden="true">&#160;</p>
-          <p>       def develop(self): </p>
-          <p>              return "Turning ideas into visual forms."</p>
-          <p class="blank" aria-hidden="true">&#160;</p>
-          <p>Overview</p>
+          <p class="terminal-subhead">Overview</p>
           <p>Lukisan menjadi salah satu media dalam mengembangkan kreativitas dan cara berpikir visual. Melalui proses mengamati, mengeksplorasi warna, menyusun komposisi, dan menuangkan gagasan ke dalam bentuk visual, proses melukis tidak hanya menjadi aktivitas artistik, tetapi juga menjadi latihan dalam memahami perspektif dan menciptakan sesuatu dari sebuah ide.</p>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p>IDE │ OBSERVATION │ EXPLORATION │ EXPERIMENTATION │ VISUAL OUTPUT │ REFLECTION</p>
+          <p class="terminal-pipeline">IDE │ OBSERVATION │ EXPLORATION │ EXPERIMENTATION │ VISUAL OUTPUT │ REFLECTION</p>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p>Skills Developed</p>
-          <p>[+] Creativity </p>
-          <p>[+] Visual Observation </p>
-          <p>[+] Problem Solving </p>
-          <p>[+] Experimentation </p>
-          <p>[+] Attention to Detail </p>
+          <p class="terminal-subhead">Skills Developed</p>
+          <p>[+] Creativity</p>
+          <p>[+] Visual Observation</p>
+          <p>[+] Problem Solving</p>
+          <p>[+] Experimentation</p>
+          <p>[+] Attention to Detail</p>
           <p>[+] Self Expression</p>
         </div>
       </div>
+
       <div class="painting-gallery" aria-label="Galeri project painting">
         <div class="painting-pair">
-          <img class="painting painting-red" src="./assets/painting-red.png" alt="Lukisan abstrak berwarna merah dalam bingkai putih" loading="lazy" decoding="async" width="325" height="406">
-          <img class="painting painting-color" src="./assets/painting-color.png" alt="Lukisan abstrak berwarna-warni dalam bingkai putih" loading="lazy" decoding="async" width="325" height="406">
+          <figure class="painting-item" data-tilt>
+            <img class="painting painting-red" src="./assets/painting-red.png" alt="Lukisan abstrak berwarna merah dalam bingkai putih" loading="lazy" decoding="async" width="325" height="406">
+          </figure>
+          <figure class="painting-item" data-tilt>
+            <img class="painting painting-color" src="./assets/painting-color.png" alt="Lukisan abstrak berwarna-warni dalam bingkai putih" loading="lazy" decoding="async" width="325" height="406">
+          </figure>
         </div>
       </div>
-      <div class="learning">
+
+      <!-- 02 — SELECTED PROJECTS (Penjelasan sebelum bab CMS Project) -->
+      <div class="resume-band projects-intro">
         <div class="terminal">
-          <h3 class="terminal-heading">02 — DATA SCIENCE</h3>
+          <h3 class="terminal-heading">02 — PROJECTS ARCHIVE</h3>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p>PROJECT: STUDENT JOURNEY</p>
-          <p>         student = { "name": "Mushab Aqil Sulaeman", "role": "Data Science. Student", "university": "Telkom University", "field": "Data Science" }  </p>
+          <p class="terminal-label">MODULE: CMS_PROJECTS</p>
+          <pre class="code-block"><code><span class="code-kw">class</span> <span class="code-fn">ProjectArchive</span>:
+    <span class="code-kw">def</span> <span class="code-fn">__init__</span>(<span class="code-self">self</span>, source=<span class="code-str">"cms-data.js"</span>):
+        <span class="code-self">self</span>.source  = source
+        <span class="code-self">self</span>.domains = [<span class="code-str">"Data Science"</span>, <span class="code-str">"Web Engineering"</span>, <span class="code-str">"Creative Art"</span>]
+        <span class="code-self">self</span>.display = <span class="code-str">"framed_gallery"</span>
+
+    <span class="code-kw">def</span> <span class="code-fn">load_works</span>(<span class="code-self">self</span>):
+        <span class="code-kw">return</span> cms.query(<span class="code-str">"projects"</span>, sort=<span class="code-str">"latest"</span>)</code></pre>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p>print(student)</p>
+          <p class="terminal-subhead">Overview</p>
+          <p>Bagian ini menghimpun berbagai project yang telah saya bangun—mulai dari eksplorasi analisis data, pengembangan web, hingga eksperimen visual. Setiap karya disimpan secara terstruktur dalam sistem CMS Project dan dipamerkan layaknya koleksi galeri berbingkai agar proses, teknologi, dan hasil tiap project mudah ditelusuri.</p>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p>Overview</p>
-          <p>Sebagai mahasiswa Data Science di Telkom University, saya mempelajari bagaimana data dapat digunakan untuk memahami suatu masalah, menemukan pola, dan menghasilkan informasi yang dapat digunakan dalam pengambilan keputusan.</p>
-          <p>Pembelajaran tidak hanya berfokus pada pemrograman, tetapi juga mencakup matematika, statistika, algoritma, pengolahan data, dan pengembangan pola berpikir analitis.</p>
+          <p class="terminal-pipeline">CONCEPT │ ARCHITECTURE │ BUILD │ ITERATE │ SHOWCASE</p>
+        </div>
+      </div>
+
+      <!-- BAB CMS 1: GALERI PROJECT -->
+      <div class="cms-gallery-band projects-band" aria-label="Galeri project dari CMS">
+        <div class="cms-band-inner">
+          <div class="cms-band-header">
+            <div class="cms-band-meta">
+              <span class="cms-band-kicker">CMS // PROJECTS</span>
+              <span id="projects-count" class="cms-band-count">0 works</span>
+            </div>
+            <div class="cms-band-controls">
+              <div id="projects-filter-bar" class="cms-filter-bar" role="tablist" aria-label="Filter kategori project">
+                <span class="filter-indicator" aria-hidden="true"></span>
+              </div>
+              <button type="button" class="cms-inline-trigger" data-open-cms="projects" title="Kelola data Project di CMS">
+                $ edit --projects
+              </button>
+            </div>
+          </div>
+          <div id="cms-projects-grid" class="projects-grid" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <!-- 03 — EDUCATION & EXPERIENCE (Penjelasan sebelum bab CMS Pengalaman & Pendidikan) -->
+      <div class="resume-band education-intro">
+        <div class="terminal">
+          <h3 class="terminal-heading">03 — EDUCATION &amp; EXPERIENCE</h3>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p>MATHEMATICS │ STATISTICS │ PROGRAMMING │ DATA ANALYSIS │ MACHINE LEARNING</p>
+          <p class="terminal-label">MODULE: CMS_EDUCATION_EXPERIENCE</p>
+          <pre class="code-block"><code><span class="code-self">student_journey</span> = {
+    <span class="code-str">"name"</span>:       <span class="code-str">"Mushab Aqil Sulaeman"</span>,
+    <span class="code-str">"role"</span>:       <span class="code-str">"Data Science Student"</span>,
+    <span class="code-str">"university"</span>: <span class="code-str">"Telkom University"</span>,
+    <span class="code-str">"tracks"</span>:     [<span class="code-str">"Pendidikan"</span>, <span class="code-str">"Pengalaman"</span>, <span class="code-str">"Self-Taught"</span>]
+}
+
+<span class="code-self">timeline</span> = cms.load(<span class="code-str">"educationExperience"</span>, order=<span class="code-str">"chronological"</span>)
+<span class="code-fn">print</span>(<span class="code-self">timeline</span>)</code></pre>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p>Current Learning Stack</p>
-          <p>            learning = [ "Python", "Statistics", "Mathematics", "Algorithms", "Data Analysis", "SQL", "Machine Learning" ]</p>
+          <p class="terminal-subhead">Overview</p>
+          <p>Sebagai mahasiswa Data Science di Telkom University, saya mempelajari bagaimana data digunakan untuk memahami masalah, menemukan pola, dan mendukung pengambilan keputusan—mencakup matematika, statistika, algoritma, pemrograman, dan machine learning.</p>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <h3 class="terminal-heading">03 — SELF-TAUGHT DEVELOPMENT</h3>
+          <p>Di bawah ini tersusun runtutan pendidikan dan pengalaman saya secara kronologis melalui CMS Pengalaman &amp; Pendidikan, menggambarkan bagaimana fondasi akademik bertemu dengan praktik nyata dan eksplorasi mandiri.</p>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p>SYSTEM: AUTODIDACTIC LEARNING</p>
-          <p>          class SelfTaughtSystem:  </p>
-          <p>              def learn(self, problem): </p>
-          <p>              problem = self.identify(problem) </p>
-          <p>              knowledge = self.research(problem) </p>
-          <p>              practice = self.experiment(knowledge) result =  </p>
+          <p class="terminal-pipeline">MATHEMATICS │ STATISTICS │ PROGRAMMING │ DATA ANALYSIS │ MACHINE LEARNING</p>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p>          self.evaluate(practice)  </p>
-          <p>               return result</p>
-          <p>Philosophy</p>
+          <p class="terminal-subhead">Current Learning Stack</p>
+          <pre class="code-block code-block-compact"><code><span class="code-self">learning</span> = [
+    <span class="code-str">"Python"</span>, <span class="code-str">"Statistics"</span>, <span class="code-str">"Mathematics"</span>,
+    <span class="code-str">"Algorithms"</span>, <span class="code-str">"Data Analysis"</span>, <span class="code-str">"SQL"</span>, <span class="code-str">"Machine Learning"</span>
+]</code></pre>
+        </div>
+      </div>
+
+      <!-- BAB CMS 2: RUNTUTAN PENGALAMAN & PENDIDIKAN -->
+      <div class="cms-gallery-band timeline-band" aria-label="Runtutan pengalaman dan pendidikan dari CMS">
+        <div class="cms-band-inner">
+          <div class="cms-band-header">
+            <div class="cms-band-meta">
+              <span class="cms-band-kicker">CMS // EDUCATION &amp; EXPERIENCE</span>
+              <span id="timeline-count" class="cms-band-count">0 entries</span>
+            </div>
+            <div class="cms-band-controls">
+              <div id="timeline-filter-bar" class="cms-filter-bar" role="tablist" aria-label="Filter pengalaman dan pendidikan">
+                <span class="filter-indicator" aria-hidden="true"></span>
+                <button type="button" class="cms-filter-btn is-active" data-filter="all" role="tab" aria-selected="true">Semua</button>
+                <button type="button" class="cms-filter-btn" data-filter="pendidikan" role="tab" aria-selected="false">Pendidikan</button>
+                <button type="button" class="cms-filter-btn" data-filter="pengalaman" role="tab" aria-selected="false">Pengalaman</button>
+              </div>
+              <button type="button" class="cms-inline-trigger" data-open-cms="educationExperience" title="Kelola data Pendidikan &amp; Pengalaman di CMS">
+                $ edit --timeline
+              </button>
+            </div>
+          </div>
+          <ol id="cms-timeline-list" class="timeline-list" aria-live="polite"></ol>
+        </div>
+      </div>
+
+      <!-- 04 — SELF-TAUGHT DEVELOPMENT -->
+      <div class="resume-band learning">
+        <div class="terminal">
+          <h3 class="terminal-heading">04 — SELF-TAUGHT DEVELOPMENT</h3>
+          <p class="blank" aria-hidden="true">&#160;</p>
+          <p class="terminal-label">SYSTEM: AUTODIDACTIC LEARNING</p>
+          <pre class="code-block"><code><span class="code-kw">class</span> <span class="code-fn">SelfTaughtSystem</span>:
+    <span class="code-kw">def</span> <span class="code-fn">learn</span>(<span class="code-self">self</span>, problem):
+        problem   = <span class="code-self">self</span>.identify(problem)
+        knowledge = <span class="code-self">self</span>.research(problem)
+        practice  = <span class="code-self">self</span>.experiment(knowledge)
+        result    = <span class="code-self">self</span>.evaluate(practice)
+        <span class="code-kw">return</span> result</code></pre>
+          <p class="blank" aria-hidden="true">&#160;</p>
+          <p class="terminal-subhead">Philosophy</p>
           <p>Kemampuan belajar secara otodidak dibangun melalui rasa ingin tahu, eksplorasi, dan keberanian untuk mencoba sesuatu yang belum dipahami.</p>
+          <p class="blank" aria-hidden="true">&#160;</p>
           <p>Bagi saya, belajar bukan hanya menerima informasi, tetapi memahami bagaimana sesuatu bekerja, mencoba menerapkannya, menemukan kesalahan, kemudian memperbaikinya.</p>
           <p class="blank" aria-hidden="true">&#160;</p>
-          <p>$ learn --mode=self-taught  &gt; encounter_problem &gt; search_information &gt; understand_concept &gt; build_experiment &gt; make_mistakes &gt; analyze &gt; improve &gt; repeat</p>
+          <p><span class="code-prompt">$ learn --mode=self-taught</span>  &gt; encounter_problem &gt; search_information &gt; understand_concept &gt; build_experiment &gt; make_mistakes &gt; analyze &gt; improve &gt; repeat</p>
         </div>
       </div>
+
+      <!-- CORE PRINCIPLES & CURRENT VERSION -->
       <div class="principles">
         <div class="terminal">
           <h3 class="terminal-heading">CORE PRINCIPLES</h3>
-          <p>principles = { "creativity": "Create before judging.", "learning": "Understand before memorizing.", "failure": "Treat mistakes as data.", "growth": "Improve through iteration.", "curiosity": "Keep asking why." }</p>
+          <pre class="code-block code-block-light"><code>principles = {
+    "creativity": "Create before judging.",
+    "learning":   "Understand before memorizing.",
+    "failure":    "Treat mistakes as data.",
+    "growth":     "Improve through iteration.",
+    "curiosity":  "Keep asking why."
+}</code></pre>
           <p class="blank" aria-hidden="true">&#160;</p>
           <h3 class="terminal-heading">CURRENT VERSION</h3>
-          <p>MUSHAB_AQIL_SULAEMAN  </p>
-          <p>Creative Development    ████████████████░░░░ </p>
-          <p>Data Science            ██████████████░░░░░░ </p>
-          <p>Programming             █████████████░░░░░░░ </p>
-          <p>Self-Taught Learning    ███████████████████░ </p>
-          <p>Continuous Exploration  ████████████████████</p>
+          <p>MUSHAB_AQIL_SULAEMAN</p>
+          <div class="skill-meters" aria-label="Tingkat eksplorasi skill saat ini">
+            <div class="skill-meter" data-level="80">
+              <span class="skill-label">Creative Development</span>
+              <span class="skill-track" aria-hidden="true"><span class="skill-fill"></span></span>
+              <span class="skill-pct">80%</span>
+            </div>
+            <div class="skill-meter" data-level="72">
+              <span class="skill-label">Data Science</span>
+              <span class="skill-track" aria-hidden="true"><span class="skill-fill"></span></span>
+              <span class="skill-pct">72%</span>
+            </div>
+            <div class="skill-meter" data-level="68">
+              <span class="skill-label">Programming</span>
+              <span class="skill-track" aria-hidden="true"><span class="skill-fill"></span></span>
+              <span class="skill-pct">68%</span>
+            </div>
+            <div class="skill-meter" data-level="95">
+              <span class="skill-label">Self-Taught Learning</span>
+              <span class="skill-track" aria-hidden="true"><span class="skill-fill"></span></span>
+              <span class="skill-pct">95%</span>
+            </div>
+            <div class="skill-meter" data-level="100">
+              <span class="skill-label">Continuous Exploration</span>
+              <span class="skill-track" aria-hidden="true"><span class="skill-fill"></span></span>
+              <span class="skill-pct">100%</span>
+            </div>
+          </div>
           <p class="blank" aria-hidden="true">&#160;</p>
           <p>$ git status  On branch: self-development  modified: creativity knowledge programming analytical_thinking  untracked: new_ideas new_projects new_questions  nothing is finished.</p>
           <p class="closing">Learn. Create. Analyze. Iterate.</p>
+          <div class="terminal-cms-bar">
+            <button type="button" class="terminal-cms-btn" data-open-cms="projects">
+              $ cms --open <span class="terminal-cms-hint"># Kelola Project &amp; Pengalaman Pendidikan</span>
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -145,5 +274,75 @@
       </a>
     </footer>
   </main>
+
+  <!-- MODAL DETAIL PROJECT -->
+  <div id="project-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="project-modal-title" hidden>
+    <div class="modal-backdrop" data-close-modal="project-modal"></div>
+    <div class="modal-card project-modal-card">
+      <button type="button" class="modal-close" data-close-modal="project-modal" aria-label="Tutup detail project">&times;</button>
+      <div class="project-modal-frame">
+        <div id="project-modal-visual" class="project-modal-visual"></div>
+      </div>
+      <div class="project-modal-body">
+        <div class="project-modal-meta">
+          <span id="project-modal-category" class="modal-badge"></span>
+          <span id="project-modal-year" class="modal-year"></span>
+          <span id="project-modal-status" class="modal-status"></span>
+        </div>
+        <h3 id="project-modal-title" class="project-modal-title"></h3>
+        <p id="project-modal-desc" class="project-modal-desc"></p>
+        <div id="project-modal-stack" class="project-modal-stack"></div>
+        <div id="project-modal-links" class="project-modal-links"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CMS STUDIO MODAL (Project CMS + Pengalaman & Pendidikan CMS) -->
+  <div id="cms-modal" class="modal-overlay cms-overlay" role="dialog" aria-modal="true" aria-labelledby="cms-modal-title" hidden>
+    <div class="modal-backdrop" data-close-modal="cms-modal"></div>
+    <div class="cms-studio">
+      <header class="cms-studio-header">
+        <div>
+          <p class="cms-studio-kicker">WITHMUSH_ // PORTFOLIO CMS</p>
+          <h3 id="cms-modal-title" class="cms-studio-title">Kelola Konten Resume</h3>
+        </div>
+        <button type="button" class="modal-close" data-close-modal="cms-modal" aria-label="Tutup CMS Studio">&times;</button>
+      </header>
+
+      <div class="cms-studio-tabs" role="tablist">
+        <button type="button" class="cms-tab-btn is-active" data-cms-tab="projects" role="tab" aria-selected="true">
+          01. CMS Project
+        </button>
+        <button type="button" class="cms-tab-btn" data-cms-tab="educationExperience" role="tab" aria-selected="false">
+          02. CMS Pengalaman &amp; Pendidikan
+        </button>
+      </div>
+
+      <div class="cms-studio-body">
+        <aside class="cms-list-pane">
+          <div class="cms-list-toolbar">
+            <span id="cms-list-label" class="cms-list-label">Daftar Item</span>
+            <button type="button" id="cms-add-new" class="cms-btn cms-btn-primary">+ Tambah Baru</button>
+          </div>
+          <ul id="cms-items-list" class="cms-items-list"></ul>
+        </aside>
+
+        <section class="cms-editor-pane">
+          <form id="cms-form" class="cms-form" novalidate></form>
+        </section>
+      </div>
+
+      <footer class="cms-studio-footer">
+        <p class="cms-export-note">Perubahan langsung tampil di halaman (tersimpan di browser). Untuk publikasi permanen, download <code>cms-data.js</code> lalu timpa file di folder proyek.</p>
+        <div class="cms-footer-actions">
+          <button type="button" id="cms-reset-btn" class="cms-btn cms-btn-ghost">Reset ke File Asli</button>
+          <button type="button" id="cms-copy-btn" class="cms-btn cms-btn-secondary">Copy cms-data.js</button>
+          <button type="button" id="cms-download-btn" class="cms-btn cms-btn-primary">Download cms-data.js</button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <div id="cms-toast" class="cms-toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>
