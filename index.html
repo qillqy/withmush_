@@ -9,9 +9,9 @@
   <link rel="preload" href="./assets/fonts/libre-barcode-128.ttf" as="font" type="font/ttf">
   <link rel="preload" href="./assets/fonts/libre-barcode-39-text.ttf" as="font" type="font/ttf">
   <link rel="preload" href="./assets/fonts/inter-regular.ttf" as="font" type="font/ttf">
-  <link rel="stylesheet" href="./styles.css?v=15">
+  <link rel="stylesheet" href="./styles.css?v=16">
   <script src="./cms-data.js?v=2" defer></script>
-  <script src="./script.js?v=11" defer></script>
+  <script src="./script.js?v=12" defer></script>
 </head>
 <body class="is-loading">
   <!-- EDITORIAL LOADING SCREEN -->
@@ -334,17 +334,20 @@
 
       <div class="cms-studio-tabs" role="tablist">
         <button type="button" class="cms-tab-btn is-active" data-cms-tab="artGallery" role="tab" aria-selected="true">
-          01. Art Gallery CMS
+          01. Art Gallery
         </button>
         <button type="button" class="cms-tab-btn" data-cms-tab="projects" role="tab" aria-selected="false">
-          02. Projects CMS
+          02. Projects
         </button>
         <button type="button" class="cms-tab-btn" data-cms-tab="educationExperience" role="tab" aria-selected="false">
-          03. Education &amp; Experience CMS
+          03. Education &amp; Exp
+        </button>
+        <button type="button" class="cms-tab-btn" data-cms-tab="github" role="tab" aria-selected="false">
+          04. GitHub Publish
         </button>
       </div>
 
-      <div class="cms-studio-body">
+      <div id="cms-content-body" class="cms-studio-body">
         <aside class="cms-list-pane">
           <div class="cms-list-toolbar">
             <span id="cms-list-label" class="cms-list-label">Items</span>
@@ -358,13 +361,51 @@
         </section>
       </div>
 
+      <div id="cms-github-pane" class="cms-github-pane" hidden>
+        <form id="cms-github-form" class="cms-form cms-gh-form" autocomplete="off">
+          <div class="cms-field">
+            <label for="gh-owner">GitHub Username / Owner</label>
+            <input id="gh-owner" name="owner" type="text" value="qillqy" required>
+          </div>
+          <div class="cms-field">
+            <label for="gh-repo">Repository Name</label>
+            <input id="gh-repo" name="repo" type="text" value="withmush_" required>
+          </div>
+          <div class="cms-field">
+            <label for="gh-branch">Branch</label>
+            <input id="gh-branch" name="branch" type="text" value="main" required>
+          </div>
+          <div class="cms-field">
+            <label for="gh-token">Personal Access Token (stored only in this browser)</label>
+            <input id="gh-token" name="token" type="password" placeholder="github_pat_..." autocomplete="off">
+          </div>
+          <div class="cms-field is-full">
+            <div id="cms-gh-status" class="cms-gh-status" role="status" aria-live="polite">Not connected yet. Enter your GitHub token to enable 1-click publishing.</div>
+          </div>
+          <div class="cms-form-actions">
+            <button type="button" id="gh-clear-btn" class="cms-btn cms-btn-danger">Clear Token</button>
+            <div class="cms-gh-btn-group">
+              <button type="button" id="gh-test-btn" class="cms-btn cms-btn-secondary">Test Connection</button>
+              <button type="submit" class="cms-btn cms-btn-primary">Save GitHub Settings</button>
+            </div>
+          </div>
+          <div class="cms-field is-full cms-gh-guide">
+            <p><strong>How to create a secure token (1 minute):</strong></p>
+            <p>1. Open GitHub &rarr; Settings &rarr; Developer settings &rarr; Personal access tokens &rarr; <strong>Fine-grained tokens</strong> &rarr; Generate new token.</p>
+            <p>2. Under <strong>Repository access</strong>, select <strong>Only select repositories</strong> &rarr; choose <code>qillqy/withmush_</code>.</p>
+            <p>3. Under <strong>Permissions &rarr; Repository permissions</strong>, set <strong>Contents</strong> to <strong>Read and write</strong>, then generate and paste the token above.</p>
+            <p>Your token stays strictly inside this browser's local storage and is never committed to your repository.</p>
+          </div>
+        </form>
+      </div>
+
       <footer class="cms-studio-footer">
-        <p class="cms-export-note">Changes preview live in your browser. To publish permanently, download <code>cms-data.js</code> and replace the file in your repository.</p>
+        <p class="cms-export-note">Publish directly to GitHub to make edits permanent across all devices (uploaded images are saved to <code>assets/uploads/</code>).</p>
         <div class="cms-footer-actions">
-          <button type="button" id="cms-lock-btn" class="cms-btn cms-btn-ghost">Lock CMS</button>
-          <button type="button" id="cms-reset-btn" class="cms-btn cms-btn-ghost">Reset Default</button>
-          <button type="button" id="cms-copy-btn" class="cms-btn cms-btn-secondary">Copy cms-data.js</button>
-          <button type="button" id="cms-download-btn" class="cms-btn cms-btn-primary">Download cms-data.js</button>
+          <button type="button" id="cms-lock-btn" class="cms-btn cms-btn-ghost">Lock</button>
+          <button type="button" id="cms-reset-btn" class="cms-btn cms-btn-ghost">Reset</button>
+          <button type="button" id="cms-download-btn" class="cms-btn cms-btn-secondary">Download File</button>
+          <button type="button" id="cms-publish-btn" class="cms-btn cms-btn-publish">Publish to GitHub</button>
         </div>
       </footer>
     </div>

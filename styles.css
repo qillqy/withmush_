@@ -1287,10 +1287,54 @@ button:active, .nav a:active, .cms-filter-btn:active, .cms-btn:active {
 }
 .cms-btn:hover { transform: translateY(-1px); }
 .cms-btn-primary { background: var(--paper); color: var(--ink); }
+.cms-btn-publish { background: #ffffff; color: #161616; font-weight: 500; }
+.cms-btn-publish:disabled { opacity: .55; cursor: wait; transform: none; }
 .cms-btn-secondary { background: rgba(255, 255, 255, .12); color: var(--white); border-color: rgba(255, 255, 255, .22); }
 .cms-btn-ghost { background: transparent; color: rgba(255, 255, 255, .72); border-color: rgba(255, 255, 255, .18); }
 .cms-btn-danger { background: transparent; color: #ff8f8f; border-color: rgba(255, 143, 143, .4); }
 .cms-btn-danger:hover { background: rgba(255, 143, 143, .15); }
+
+.cms-github-pane {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 22px 24px;
+}
+.cms-gh-form { max-width: 760px; }
+.cms-gh-btn-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.cms-gh-status {
+  padding: 11px 14px;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255, 255, 255, .14);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, .82);
+}
+.cms-gh-status.is-ok {
+  border-color: rgba(142, 224, 162, .45);
+  color: #a9efb8;
+  background: rgba(142, 224, 162, .08);
+}
+.cms-gh-status.is-error {
+  border-color: rgba(255, 143, 143, .45);
+  color: #ff9c9c;
+  background: rgba(255, 143, 143, .08);
+}
+.cms-gh-guide {
+  margin-top: 6px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, .03);
+  border: 1px dashed rgba(255, 255, 255, .16);
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, .72);
+  gap: 6px;
+}
+.cms-gh-guide code {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--paper);
+}
 
 .cms-studio-footer {
   padding: 14px 24px;
@@ -1634,7 +1678,9 @@ button:active, .nav a:active, .cms-filter-btn:active, .cms-btn:active {
     grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
-  #cms-download-btn { grid-column: 1 / -1; }
+  #cms-publish-btn { grid-column: 1 / -1; }
+  .cms-github-pane { padding: 16px; }
+  .cms-gh-btn-group { width: 100%; }
 }
 
 @media (max-width: 640px) {

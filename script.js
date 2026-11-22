@@ -140,8 +140,10 @@
   function persistCmsData(data) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      return true;
     } catch (_) {
-      // Ignore storage quota errors
+      showToast('Browser storage is full. Click Publish to GitHub to save images to your repo.');
+      return false;
     }
   }
 
@@ -679,17 +681,33 @@
     } catch (_) {}
   }
 
-  function openCmsStudio(tab = 'artGallery') {
-    const validTabs = ['artGallery', 'projects', 'educationExperience'];
+  const cmsContentBody = document.getElementById('cms-content-body');
+  const cmsGithubPane = document.getElementById('cms-github-pane');
+
+  function setCmsTabUI(tab) {
+    const validTabs = ['artGallery', 'projects', 'educationExperience', 'github'];
     cmsActiveTab = validTabs.includes(tab) ? tab : 'artGallery';
     document.querySelectorAll('.cms-tab-btn').forEach(btn => {
       const isAct = btn.dataset.cmsTab === cmsActiveTab;
       btn.classList.toggle('is-active', isAct);
       btn.setAttribute('aria-selected', String(isAct));
     });
-    const list = cmsState[cmsActiveTab] || [];
-    cmsSelectedId = list[0]?.id || null;
-    renderCmsStudio();
+    const isGh = cmsActiveTab === 'github';
+    if (cmsContentBody) cmsContentBody.hidden = isGh;
+    if (cmsGithubPane) cmsGithubPane.hidden = !isGh;
+    if (isGh) {
+      populateGitHubForm();
+    } else {
+      const list = cmsState[cmsActiveTab] || [];
+      if (!list.some(item => item.id === cmsSelectedId)) {
+        cmsSelectedId = list[0]?.id || null;
+      }
+      renderCmsStudio();
+    }
+  }
+
+  function openCmsStudio(tab = 'artGallery') {
+    setCmsTabUI(tab);
     openModal(cmsModal);
   }
 
@@ -743,16 +761,7 @@
   }
 
   document.querySelectorAll('.cms-tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      cmsActiveTab = btn.dataset.cmsTab;
-      document.querySelectorAll('.cms-tab-btn').forEach(b => {
-        const isAct = b === btn;
-        b.classList.toggle('is-active', isAct);
-        b.setAttribute('aria-selected', String(isAct));
-      });
-      cmsSelectedId = cmsState[cmsActiveTab][0]?.id || null;
-      renderCmsStudio();
-    });
+    btn.addEventListener('click', () => setCmsTabUI(btn.dataset.cmsTab));
   });
 
   function syncAndRefreshUI() {
@@ -957,15 +966,16 @@
 
     const fileInput = document.getElementById('f-image-file');
     if (fileInput) {
-      fileInput.addEventListener('change', () => {
+      fileInput.addEventListener('change', async () => {
         const file = fileInput.files?.[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          document.getElementById('f-image').value = reader.result;
-          showToast('Image preview loaded. Click Save Changes.');
-        };
-        reader.readAsDataURL(file);
+        try {
+          const compressed = await compressImageFile(file);
+          document.getElementById('f-image').value = compressed;
+          showToast('Image optimized & loaded. Click Save Changes, then Publish to GitHub.');
+        } catch (_) {
+          showToast('Could not read image file.');
+        }
       });
     }
 
@@ -1062,6 +1072,245 @@
     return `/**\n * WITHMUSH_ PORTFOLIO CMS DATA\n * Generated via built-in CMS Studio\n */\n\nwindow.CMS_DATA = ${JSON.stringify(cmsState, null, 2)};\n`;
   }
 
+  function compressImageFile(file, maxDim = 1600, quality = 0.86) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('read_failed'));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => resolve(reader.result);
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            const scale = Math.min(maxDim / width, maxDim / height);
+            width = Math.round(width * scale);
+            height = Math.round(height * scale);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const outType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+          const dataUrl = outType === 'image/png'
+            ? canvas.toDataURL('image/png')
+            : canvas.toDataURL('image/jpeg', quality);
+          resolve(dataUrl);
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ==========================================================================
+  // 12B. GITHUB DIRECT PUBLISH (GitHub Contents API)
+  // ==========================================================================
+  const GH_CONFIG_KEY = 'withmush_gh_config_v1';
+  const ghForm = document.getElementById('cms-github-form');
+  const ghStatusEl = document.getElementById('cms-gh-status');
+  const publishBtn = document.getElementById('cms-publish-btn');
+
+  function getGitHubConfig() {
+    const defaults = { owner: 'qillqy', repo: 'withmush_', branch: 'main', token: '' };
+    try {
+      const saved = JSON.parse(localStorage.getItem(GH_CONFIG_KEY) || 'null');
+      if (saved && typeof saved === 'object') {
+        return {
+          owner: String(saved.owner || defaults.owner).trim(),
+          repo: String(saved.repo || defaults.repo).trim(),
+          branch: String(saved.branch || defaults.branch).trim(),
+          token: String(saved.token || '').trim()
+        };
+      }
+    } catch (_) {}
+    return defaults;
+  }
+
+  function saveGitHubConfig(cfg) {
+    try {
+      localStorage.setItem(GH_CONFIG_KEY, JSON.stringify(cfg));
+    } catch (_) {}
+  }
+
+  function setGhStatus(text, tone = '') {
+    if (!ghStatusEl) return;
+    ghStatusEl.textContent = text;
+    ghStatusEl.classList.remove('is-ok', 'is-error');
+    if (tone === 'ok') ghStatusEl.classList.add('is-ok');
+    if (tone === 'error') ghStatusEl.classList.add('is-error');
+  }
+
+  function populateGitHubForm() {
+    if (!ghForm) return;
+    const cfg = getGitHubConfig();
+    ghForm.elements.owner.value = cfg.owner;
+    ghForm.elements.repo.value = cfg.repo;
+    ghForm.elements.branch.value = cfg.branch;
+    ghForm.elements.token.value = cfg.token;
+    if (cfg.token) {
+      setGhStatus(`Ready to publish to ${cfg.owner}/${cfg.repo} (${cfg.branch}).`, 'ok');
+    } else {
+      setGhStatus('Not connected yet. Enter your GitHub token to enable 1-click publishing.');
+    }
+  }
+
+  function utf8ToBase64(str) {
+    const bytes = new TextEncoder().encode(str);
+    let binary = '';
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+    }
+    return btoa(binary);
+  }
+
+  async function githubRequest(url, token, options = {}) {
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${token}`,
+        'X-GitHub-Api-Version': '2022-11-28',
+        ...(options.headers || {})
+      }
+    });
+    let body = null;
+    try { body = await res.json(); } catch (_) {}
+    return { ok: res.ok, status: res.status, body };
+  }
+
+  async function putGitHubFile(cfg, filePath, base64Content, commitMessage) {
+    const apiBase = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${filePath.split('/').map(encodeURIComponent).join('/')}`;
+    const existing = await githubRequest(`${apiBase}?ref=${encodeURIComponent(cfg.branch)}`, cfg.token);
+    const payload = {
+      message: commitMessage,
+      content: base64Content,
+      branch: cfg.branch
+    };
+    if (existing.ok && existing.body?.sha) {
+      payload.sha = existing.body.sha;
+    }
+    const put = await githubRequest(apiBase, cfg.token, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!put.ok) {
+      throw new Error(put.body?.message || `GitHub API error (${put.status})`);
+    }
+    return put.body;
+  }
+
+  async function testGitHubConnection() {
+    const cfg = {
+      owner: String(ghForm?.elements.owner.value || '').trim(),
+      repo: String(ghForm?.elements.repo.value || '').trim(),
+      branch: String(ghForm?.elements.branch.value || 'main').trim(),
+      token: String(ghForm?.elements.token.value || '').trim()
+    };
+    if (!cfg.token) {
+      setGhStatus('Please paste your GitHub Personal Access Token first.', 'error');
+      return;
+    }
+    setGhStatus('Testing connection to GitHub...');
+    try {
+      const res = await githubRequest(`https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}`, cfg.token);
+      if (res.ok) {
+        saveGitHubConfig(cfg);
+        setGhStatus(`Connected to ${res.body.full_name} (default branch: ${res.body.default_branch}).`, 'ok');
+        showToast('GitHub connection verified.');
+      } else {
+        setGhStatus(`Connection failed: ${res.body?.message || res.status}`, 'error');
+      }
+    } catch (err) {
+      setGhStatus(`Network error: ${err.message}`, 'error');
+    }
+  }
+
+  async function publishToGitHub() {
+    const cfg = getGitHubConfig();
+    if (!cfg.token || !cfg.owner || !cfg.repo) {
+      setCmsTabUI('github');
+      setGhStatus('Add your GitHub token first, then click Publish to GitHub.', 'error');
+      showToast('Set up your GitHub token in tab 04 first.');
+      return;
+    }
+
+    if (publishBtn) {
+      publishBtn.disabled = true;
+      publishBtn.textContent = 'Publishing...';
+    }
+
+    try {
+      let uploadedCount = 0;
+      const collections = [
+        ...(cmsState.artGallery || []),
+        ...(cmsState.projects || [])
+      ];
+
+      for (const item of collections) {
+        if (typeof item.image === 'string' && item.image.startsWith('data:image/')) {
+          const match = item.image.match(/^data:image\/([a-zA-Z0-9+.-]+);base64,(.+)$/);
+          if (!match) continue;
+          const extRaw = match[1].toLowerCase().replace('jpeg', 'jpg');
+          const ext = ['jpg', 'png', 'webp', 'gif'].includes(extRaw) ? extRaw : 'jpg';
+          const safeId = String(item.id || 'img').replace(/[^a-z0-9_-]/gi, '');
+          const relPath = `assets/uploads/${safeId}-${Date.now()}.${ext}`;
+          await putGitHubFile(cfg, relPath, match[2], `chore(cms): upload ${relPath}`);
+          item.image = `./${relPath}`;
+          uploadedCount += 1;
+        }
+      }
+
+      const fileString = buildCmsFileString();
+      await putGitHubFile(cfg, 'cms-data.js', utf8ToBase64(fileString), 'chore(cms): update portfolio content');
+
+      persistCmsData(cmsState);
+      renderArtGallery();
+      renderProjectFilters();
+      renderProjectsGrid();
+      renderTimeline();
+      if (cmsActiveTab !== 'github') renderCmsStudio();
+
+      const imgNote = uploadedCount ? ` (+${uploadedCount} image${uploadedCount > 1 ? 's' : ''})` : '';
+      setGhStatus(`Published to ${cfg.owner}/${cfg.repo}@${cfg.branch}${imgNote}. Live site updates in ~30–60s.`, 'ok');
+      showToast(`Published to GitHub${imgNote}! Live in ~30–60s.`);
+    } catch (err) {
+      setGhStatus(`Publish failed: ${err.message}`, 'error');
+      showToast(`Publish failed: ${err.message}`);
+    } finally {
+      if (publishBtn) {
+        publishBtn.disabled = false;
+        publishBtn.textContent = 'Publish to GitHub';
+      }
+    }
+  }
+
+  ghForm?.addEventListener('submit', e => {
+    e.preventDefault();
+    const cfg = {
+      owner: String(ghForm.elements.owner.value || '').trim(),
+      repo: String(ghForm.elements.repo.value || '').trim(),
+      branch: String(ghForm.elements.branch.value || 'main').trim(),
+      token: String(ghForm.elements.token.value || '').trim()
+    };
+    saveGitHubConfig(cfg);
+    setGhStatus(`Settings saved for ${cfg.owner}/${cfg.repo} (${cfg.branch}).`, 'ok');
+    showToast('GitHub settings saved in this browser.');
+  });
+
+  document.getElementById('gh-test-btn')?.addEventListener('click', testGitHubConnection);
+  document.getElementById('gh-clear-btn')?.addEventListener('click', () => {
+    const cfg = getGitHubConfig();
+    cfg.token = '';
+    saveGitHubConfig(cfg);
+    populateGitHubForm();
+    showToast('GitHub token cleared from this browser.');
+  });
+
+  publishBtn?.addEventListener('click', publishToGitHub);
+
   document.getElementById('cms-download-btn')?.addEventListener('click', () => {
     const blob = new Blob([buildCmsFileString()], { type: 'application/javascript;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -1075,15 +1324,6 @@
     showToast('cms-data.js downloaded.');
   });
 
-  document.getElementById('cms-copy-btn')?.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(buildCmsFileString());
-      showToast('cms-data.js copied to clipboard.');
-    } catch (_) {
-      showToast('Copy failed. Please use Download instead.');
-    }
-  });
-
   document.getElementById('cms-lock-btn')?.addEventListener('click', () => {
     setCmsUnlocked(false);
     closeModal(cmsModal);
@@ -1093,7 +1333,9 @@
   document.getElementById('cms-reset-btn')?.addEventListener('click', () => {
     try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
     cmsState = getDefaultData();
-    cmsSelectedId = cmsState[cmsActiveTab][0]?.id || null;
+    if (cmsActiveTab !== 'github') {
+      cmsSelectedId = cmsState[cmsActiveTab][0]?.id || null;
+    }
     syncAndRefreshUI();
     showToast('Reset to default cms-data.js.');
   });
