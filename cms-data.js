@@ -4,7 +4,16 @@
  */
 
 window.CMS_DATA = {
+  "updatedAt": 1795331262322,
   "artGallery": [
+    {
+      "id": "art-1795330594789",
+      "title": "Nausia",
+      "medium": "Abstract Painting",
+      "year": "2025",
+      "image": "./assets/uploads/art-1795330594789-1795331250129.png",
+      "description": "Grasping the quiet meaning of a sunless night."
+    },
     {
       "id": "art-crimson-study",
       "title": "Distorted",
@@ -24,21 +33,34 @@ window.CMS_DATA = {
   ],
   "projects": [
     {
-      "id": "proj-withmush-portfolio",
-      "title": "Personal Portfolio — withmush_",
-      "category": "Web Development",
+      "id": "proj-1795330980099",
+      "title": "NewWin",
+      "category": "UI/UX Development",
       "year": "2026",
-      "status": "Active",
-      "summary": "An editorial, code-inspired personal portfolio combining gallery-framed visuals, fluid motion, and a built-in private CMS.",
-      "description": "Designed to bridge technical craft and visual storytelling in a lightweight static web experience. Features JetBrains Mono and Libre Barcode typography, framed exhibition layouts, smooth scroll choreography, and a passcode-protected CMS for managing artworks, projects, and academic milestones.",
+      "status": "Completed",
+      "summary": "A Windows desktop customization (ricing) project that blends visual aesthetics with workflow efficiency. Powered by Komorebi, YASB, and Windhawk, it transforms a standard workspace into a personalized interface where creativity meets technology.",
+      "description": "This project is an exploration of Windows interface customization (ricing) aimed at merging design creativity with technical efficiency. By integrating Komorebi as a tiling window manager, YASB for an informative status bar, and Windhawk for system-level tweaks, the desktop is redesigned to be minimalist, structured, and responsive. Through this approach, the operating system functions not just as a productivity tool, but as a creative canvas optimized through technical configuration.",
       "stack": [
-        "HTML5",
-        "CSS3",
-        "JavaScript",
-        "UI/UX Design"
+        "CSS"
       ],
-      "image": "",
+      "image": "./assets/uploads/proj-1795330980099-1795331253710.png",
       "link": "",
+      "repo": "https://github.com/qillqy/NewWin.git"
+    },
+    {
+      "id": "proj-1795330668921",
+      "title": "Qasasuna Project",
+      "category": "Creative Art",
+      "year": "2022 - present",
+      "status": "In Progress",
+      "summary": "Qasasuna is a reflective project focused on understanding the essence of attachment and the deeper meaning behind a relationship.",
+      "description": "Qasasuna is an exploratory project that delves into the essence of attachment and the dynamics that shape a relationship. Through a contemplative approach, it observes how bonds are formed, sustained, and how they influence the way we interpret each other's presence. More than just documentation, Qasasuna serves as a space to weave stories together and understand the value of connection that lives within every relationship.",
+      "stack": [
+        "Visual StoryTelling",
+        "Editorial"
+      ],
+      "image": "./assets/uploads/proj-1795330668921-1795331257788.png",
+      "link": "https://www.instagram.com/qasasuna?utm_source=ig_web_button_share_sheet&evlk=ZDNlZDc0MzIxNw==",
       "repo": ""
     },
     {
