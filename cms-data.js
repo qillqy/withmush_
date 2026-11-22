@@ -4,7 +4,7 @@
  */
 
 window.CMS_DATA = {
-  "updatedAt": 1795337738544,
+  "updatedAt": 1795338182063,
   "artGallery": [
     {
       "id": "art-1795330594789",
@@ -33,8 +33,8 @@ window.CMS_DATA = {
   ],
   "projects": [
     {
-      "id": "proj-1795337286831",
-      "title": "Ncspot Detector",
+      "id": "proj-1795338047096",
+      "title": "NCSpot Detector",
       "category": "Problem Solving",
       "year": "2026",
       "status": "Completed",
@@ -43,7 +43,7 @@ window.CMS_DATA = {
       "stack": [
         "Swift"
       ],
-      "image": "./assets/uploads/proj-1795337286831-1795337734756.png",
+      "image": "./assets/uploads/proj-1795338047096-1795338177742.png",
       "link": "",
       "repo": ""
     },
