@@ -4,7 +4,7 @@
  */
 
 window.CMS_DATA = {
-  "updatedAt": 1795331262322,
+  "updatedAt": 1795337738544,
   "artGallery": [
     {
       "id": "art-1795330594789",
@@ -32,6 +32,21 @@ window.CMS_DATA = {
     }
   ],
   "projects": [
+    {
+      "id": "proj-1795337286831",
+      "title": "Ncspot Detector",
+      "category": "Problem Solving",
+      "year": "2026",
+      "status": "Completed",
+      "summary": "Engineered a custom real-time status detector for ncspot after exploring terminal media interfaces, seamlessly integrating live Spotify playback data into my desktop status bar.",
+      "description": "Investigated process monitoring and real-time playback data extraction for ncspot, a terminal-based Spotify client. By analyzing how background media processes communicate, I identified the bottleneck in tracking active sessions and developed a lightweight detector script. This solution dynamically captures current track metadata and playback states, rendering them directly onto my custom desktop status bar for a streamlined, keyboard-centric workflow.",
+      "stack": [
+        "Swift"
+      ],
+      "image": "./assets/uploads/proj-1795337286831-1795337734756.png",
+      "link": "",
+      "repo": ""
+    },
     {
       "id": "proj-1795330980099",
       "title": "NewWin",
@@ -61,41 +76,6 @@ window.CMS_DATA = {
       ],
       "image": "./assets/uploads/proj-1795330668921-1795331257788.png",
       "link": "https://www.instagram.com/qasasuna?utm_source=ig_web_button_share_sheet&evlk=ZDNlZDc0MzIxNw==",
-      "repo": ""
-    },
-    {
-      "id": "proj-data-exploration",
-      "title": "Exploratory Data Analysis & Visualization",
-      "category": "Data Science",
-      "year": "2025",
-      "status": "Completed",
-      "summary": "End-to-end dataset exploration, cleaning, statistical analysis, and clear visual storytelling to support data-driven decisions.",
-      "description": "A series of analytical experiments built with Python and statistical modeling to uncover anomalies, variable correlations, and actionable patterns presented through clean visual narratives.",
-      "stack": [
-        "Python",
-        "Statistics",
-        "Data Analysis",
-        "SQL"
-      ],
-      "image": "",
-      "link": "",
-      "repo": ""
-    },
-    {
-      "id": "proj-painting-series",
-      "title": "Abstract Visual Exploration — Painting Series",
-      "category": "Creative Art",
-      "year": "2025",
-      "status": "Completed",
-      "summary": "A hands-on study of color harmony, texture, and abstract composition as a discipline for visual thinking.",
-      "description": "A curated series of abstract paintings combining observation, experimentation, and visual reflection. This creative practice directly informs my approach to interface composition and data visualization.",
-      "stack": [
-        "Visual Thinking",
-        "Composition",
-        "Color Study"
-      ],
-      "image": "./assets/painting-color.png",
-      "link": "",
       "repo": ""
     }
   ],
