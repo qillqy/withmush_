@@ -108,31 +108,40 @@
     return JSON.parse(JSON.stringify(data));
   }
 
-  function getDefaultData() {
-    const src = window.CMS_DATA || {};
+  function normalizeCmsPayload(src, fallback = {}) {
+    const data = src && typeof src === 'object' ? src : {};
     return {
-      artGallery: Array.isArray(src.artGallery) ? cloneData(src.artGallery) : [],
-      projects: Array.isArray(src.projects) ? cloneData(src.projects) : [],
-      educationExperience: Array.isArray(src.educationExperience) ? cloneData(src.educationExperience) : []
+      updatedAt: Number(data.updatedAt || 0),
+      artGallery: Array.isArray(data.artGallery) ? cloneData(data.artGallery) : (Array.isArray(fallback.artGallery) ? cloneData(fallback.artGallery) : []),
+      projects: Array.isArray(data.projects) ? cloneData(data.projects) : (Array.isArray(fallback.projects) ? cloneData(fallback.projects) : []),
+      educationExperience: Array.isArray(data.educationExperience) ? cloneData(data.educationExperience) : (Array.isArray(fallback.educationExperience) ? cloneData(fallback.educationExperience) : [])
     };
+  }
+
+  function getDefaultData() {
+    return normalizeCmsPayload(window.CMS_DATA || {});
+  }
+
+  function readLocalCmsData() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return null;
+      const parsed = JSON.parse(saved);
+      if (parsed && Array.isArray(parsed.projects) && Array.isArray(parsed.educationExperience)) {
+        return parsed;
+      }
+    } catch (_) {}
+    return null;
   }
 
   function loadCmsData() {
     const defaults = getDefaultData();
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && Array.isArray(parsed.projects) && Array.isArray(parsed.educationExperience)) {
-          return {
-            artGallery: Array.isArray(parsed.artGallery) ? parsed.artGallery : defaults.artGallery,
-            projects: parsed.projects,
-            educationExperience: parsed.educationExperience
-          };
-        }
+    const local = readLocalCmsData();
+    if (local) {
+      if (defaults.updatedAt > Number(local.updatedAt || 0)) {
+        return defaults;
       }
-    } catch (_) {
-      // Fallback to window.CMS_DATA
+      return normalizeCmsPayload(local, defaults);
     }
     return defaults;
   }
@@ -145,6 +154,19 @@
       showToast('Browser storage is full. Click Publish to GitHub to save images to your repo.');
       return false;
     }
+  }
+
+  function parseCmsDataScript(scriptText) {
+    const start = scriptText.indexOf('{');
+    const end = scriptText.lastIndexOf('}');
+    if (start === -1 || end === -1 || end <= start) return null;
+    try {
+      const parsed = JSON.parse(scriptText.slice(start, end + 1));
+      if (parsed && Array.isArray(parsed.projects) && Array.isArray(parsed.educationExperience)) {
+        return normalizeCmsPayload(parsed);
+      }
+    } catch (_) {}
+    return null;
   }
 
   let cmsState = loadCmsData();
@@ -484,6 +506,43 @@
   renderProjectsGrid();
   renderTimeline();
 
+  // Bypass aggressive in-app browser caches (e.g. Instagram / Facebook WebView)
+  async function syncLatestCmsFromServer() {
+    if (!/^https?:$/i.test(location.protocol)) return;
+    try {
+      const res = await fetch(`./cms-data.js?t=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) return;
+      const fresh = parseCmsDataScript(await res.text());
+      if (!fresh) return;
+
+      const local = readLocalCmsData();
+      const localTs = Number(local?.updatedAt || 0);
+      const shouldApply = !local || fresh.updatedAt > localTs;
+      if (!shouldApply) return;
+
+      if (JSON.stringify(fresh) === JSON.stringify(cmsState)) return;
+      window.CMS_DATA = fresh;
+      cmsState = fresh;
+      if (local && fresh.updatedAt > localTs) {
+        persistCmsData(cmsState);
+      }
+      renderArtGallery();
+      renderProjectFilters();
+      renderProjectsGrid();
+      renderTimeline();
+      if (cmsModal && cmsModal.classList.contains('is-open') && cmsActiveTab !== 'github') {
+        renderCmsStudio();
+      }
+    } catch (_) {
+      // Keep initial window.CMS_DATA silently if offline
+    }
+  }
+
+  syncLatestCmsFromServer();
+  window.addEventListener('pageshow', event => {
+    if (event.persisted) syncLatestCmsFromServer();
+  });
+
   // ==========================================================================
   // 11. MODAL SYSTEM (Detail Lightbox + Passcode Auth + CMS Studio)
   // ==========================================================================
@@ -764,8 +823,11 @@
     btn.addEventListener('click', () => setCmsTabUI(btn.dataset.cmsTab));
   });
 
-  function syncAndRefreshUI() {
-    persistCmsData(cmsState);
+  function syncAndRefreshUI(shouldPersist = true) {
+    if (shouldPersist) {
+      cmsState.updatedAt = Date.now();
+      persistCmsData(cmsState);
+    }
     renderArtGallery();
     renderProjectFilters();
     renderProjectsGrid();
@@ -1263,6 +1325,7 @@
         }
       }
 
+      cmsState.updatedAt = Date.now();
       const fileString = buildCmsFileString();
       await putGitHubFile(cfg, 'cms-data.js', utf8ToBase64(fileString), 'chore(cms): update portfolio content');
 
@@ -1336,7 +1399,7 @@
     if (cmsActiveTab !== 'github') {
       cmsSelectedId = cmsState[cmsActiveTab][0]?.id || null;
     }
-    syncAndRefreshUI();
+    syncAndRefreshUI(false);
     showToast('Reset to default cms-data.js.');
   });
 
