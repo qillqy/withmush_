@@ -56,7 +56,7 @@
   --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html { scroll-behavior: smooth; overflow-x: clip; }
 body {
   margin: 0;
@@ -151,9 +151,16 @@ body.modal-open, body.is-loading { overflow: hidden; }
 .site { width: 100%; container-type: inline-size; overflow: clip; }
 p, h1, h2, h3, figure, pre, ul, ol { margin: 0; }
 a { color: inherit; }
-a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+a, button, [role="button"], input, textarea, select, label {
+  -webkit-tap-highlight-color: transparent;
+}
+:focus:not(:focus-visible) { outline: none; }
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 4px;
+}
+button:active, .nav a:active, .cms-filter-btn:active, .cms-btn:active {
+  opacity: .82;
 }
 
 /* Top silky scroll progress bar */
@@ -1432,8 +1439,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   }
 }
 
-@media (max-width: 1024px) {
-  .projects-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* Tablet (Landscape & Portrait: 641px – 1100px) */
+@media (max-width: 1100px) {
+  .terminal { font-size: clamp(14px, 1.55cqw, 17px); line-height: 1.58; }
+  .painting-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .projects-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .cms-studio-body { grid-template-columns: 250px 1fr; }
 }
 
 @media (max-width: 900px) {
